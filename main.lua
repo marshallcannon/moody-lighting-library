@@ -2,7 +2,7 @@ Moody = require 'moody'
 
 love.window.setMode(800, 600, {vsync=false, fullscreen=false})
 
-local lightWorld = Moody:new()
+local lightWorld = Moody:new(10000, 10000)
 lightWorld.debug = true
 
 translateX = 0
@@ -26,7 +26,7 @@ local light = lightWorld:newLight(60, 50, 300)
 
 function love.load()
 
-  love.graphics.setBackgroundColor(100, 150, 200, 255)
+  love.graphics.setBackgroundColor(255, 255, 255, 255)
 
   background = love.graphics.newImage('TileSet01.png')
 
@@ -70,7 +70,7 @@ end
 function love.mousepressed(x, y, button, isTouch)
 
   if button == 1 then
-    lightWorld:newLight(x, y, 250, {255, 255, 255})
+    lightWorld:newLight(x-translateX, y-translateY, 250, {255, 255, 255})
   end
   if button == 2 then
     light:toggle()

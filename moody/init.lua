@@ -11,9 +11,14 @@ local drawHullShadows, inLightRange, getShadowPoints, getExtendedPoint, getClose
 local LightWorld = {}
 LightWorld.__index = LightWorld
 
-function LightWorld:new(ambient)
+function LightWorld:new(width, height, ambient)
 
   local self = setmetatable({}, LightWorld)
+
+  local windowWidth, windowHeight = love.window.getMode()
+  self.width = width or windowWidth
+  self.height = height or windowHeight
+  self.ambient = ambient or {0, 0, 0}
 
   self.lights = {}
   self.hulls = {}
@@ -21,10 +26,8 @@ function LightWorld:new(ambient)
   self.offsetX = 0
   self.offsetY = 0
 
-  self.lightCanvas = love.graphics.newCanvas()
+  self.lightCanvas = love.graphics.newCanvas(self.width, self.height)
   --self.penumbraCanvas = love.graphics.newCanvas()
-
-  self.ambient = ambient or {0, 0, 0}
 
   self.debug = false
 
@@ -55,7 +58,7 @@ function LightWorld:draw()
         drawHullShadows(shadowPoints)
       end, 'replace', 1)
       love.graphics.setStencilTest('less', 1)
-      light:draw(self.lightCanvas)
+      light:draw(self.lightCanvas, self.offsetX, self.offsetY)
       love.graphics.setStencilTest()
       -- love.graphics.setCanvas(self.penumbraCanvas)
       -- love.graphics.setColor(255, 255, 255, 255)
