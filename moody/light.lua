@@ -4,7 +4,7 @@ local Shaders = require(directory .. '/shaders')
 local Light = {}
 Light.__index = Light
 
-function Light.new(world, x, y, range, color)
+function Light.new(x, y, range, color)
 
   local self = setmetatable({}, Light)
 

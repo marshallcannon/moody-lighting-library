@@ -19,7 +19,7 @@ for i=1, 10 do
 
 end
 
-local light = lightWorld:newLight(lightworld, 60, 50, 300)
+local light = lightWorld:newLight(60, 50, 300)
 
 function love.load()
 
