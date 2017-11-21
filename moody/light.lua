@@ -56,7 +56,7 @@ end
 
 function Light:toggle(value)
 
-  if value then
+  if value ~= nil then
     self.on = value
   else
     if self.on == true then self.on = false

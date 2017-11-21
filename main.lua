@@ -20,6 +20,8 @@ for i=1, 10 do
 
 end
 
+local testHull = lightWorld:newHull(100, 100, 100, 100)
+
 local light = lightWorld:newLight(60, 50, 300)
 
 function love.load()
@@ -72,6 +74,9 @@ function love.mousepressed(x, y, button, isTouch)
   end
   if button == 2 then
     light:toggle()
+  end
+  if button == 3 then
+    testHull:toggle()
   end
 
 end

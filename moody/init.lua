@@ -174,7 +174,7 @@ getHullsInRange = function(light, hulls)
   local hullsInRange = {}
 
   for i, hull in ipairs(hulls) do
-    if hullInLightRange(light, hull) then
+    if hull.active and hullInLightRange(light, hull) then
       table.insert(hullsInRange, hull)
     end
   end
