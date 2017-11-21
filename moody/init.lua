@@ -26,7 +26,7 @@ function LightWorld:new(ambient)
 
   self.ambient = ambient or {0, 0, 0}
 
-  self.debug = true
+  self.debug = false
 
   return self
 
@@ -44,19 +44,25 @@ function LightWorld:draw()
 
   --Draw each light
   for i, light in ipairs(self.lights) do
-    hulls = getHullsInRange(light, self.hulls)
-    --shadowPoints, penumbraPoints = getShadowPoints(light, hulls)
-    shadowPoints = getShadowPoints(light, hulls)
-    love.graphics.setCanvas(self.lightCanvas)
-    love.graphics.stencil(function()
-      drawHullShadows(shadowPoints)
-    end, 'replace', 1)
-    love.graphics.setStencilTest('less', 1)
-    light:draw(self.lightCanvas)
-    love.graphics.setStencilTest()
-    -- love.graphics.setCanvas(self.penumbraCanvas)
-    -- love.graphics.setColor(255, 255, 255, 255)
-    -- drawPenumbras(penumbraPoints)
+
+    if light.on then
+
+      hulls = getHullsInRange(light, self.hulls)
+      --shadowPoints, penumbraPoints = getShadowPoints(light, hulls)
+      shadowPoints = getShadowPoints(light, hulls)
+      love.graphics.setCanvas(self.lightCanvas)
+      love.graphics.stencil(function()
+        drawHullShadows(shadowPoints)
+      end, 'replace', 1)
+      love.graphics.setStencilTest('less', 1)
+      light:draw(self.lightCanvas)
+      love.graphics.setStencilTest()
+      -- love.graphics.setCanvas(self.penumbraCanvas)
+      -- love.graphics.setColor(255, 255, 255, 255)
+      -- drawPenumbras(penumbraPoints)
+
+    end
+
   end
 
   --Draw penumbra canvas to light canvas

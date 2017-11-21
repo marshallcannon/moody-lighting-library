@@ -3,6 +3,7 @@ Moody = require 'moody'
 love.window.setMode(800, 600, {vsync=false, fullscreen=false})
 
 local lightWorld = Moody:new()
+lightWorld.debug = true
 
 translateX = 0
 translateY = 0
@@ -42,7 +43,7 @@ end
 
 function love.update()
 
-  light:setLocation(love.mouse.getX(), love.mouse.getY())
+  light:setLocation(love.mouse.getX()-translateX, love.mouse.getY()-translateY)
 
   if love.keyboard.isDown('a') then
     translateX = translateX + 1
@@ -68,6 +69,9 @@ function love.mousepressed(x, y, button, isTouch)
 
   if button == 1 then
     lightWorld:newLight(x, y, 250, {255, 255, 255})
+  end
+  if button == 2 then
+    light:toggle()
   end
 
 end

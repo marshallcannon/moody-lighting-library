@@ -13,6 +13,7 @@ function Light.new(x, y, range, color)
   self.range = range or 64
   self.color = color or {255, 255, 255}
   self.castShadows = false
+  self.on = true
 
   return self
 
@@ -50,6 +51,17 @@ end
 function Light:shouldCastShadows(value)
 
   self.castShadows = value
+
+end
+
+function Light:toggle(value)
+
+  if value then
+    self.on = value
+  else
+    if self.on == true then self.on = false
+    else self.on = true end
+  end
 
 end
 
