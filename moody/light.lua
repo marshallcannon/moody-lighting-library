@@ -41,7 +41,7 @@ function Light:draw(canvas, offsetX, offsetY)
 
 end
 
-function Light:setLocation(x, y)
+function Light:setPosition(x, y)
 
   self.x = x
   self.y = y

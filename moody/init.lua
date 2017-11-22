@@ -87,9 +87,11 @@ function LightWorld:draw()
 
   if self.debug then
     --Debug draw hulls
-    love.graphics.setColor(100, 100, 100, 255)
     for i, hull in ipairs(self.hulls) do
+      love.graphics.setColor(100, 100, 100, 255)
       love.graphics.rectangle('line', hull.x, hull.y, hull.width, hull.height)
+      love.graphics.setColor(255, 0, 0, 255)
+      love.graphics.points(hull.p1.x, hull.p1.y, hull.p2.x, hull.p2.y, hull.p3.x, hull.p3.y, hull.p4.x, hull.p4.y)
     end
   end
 
@@ -164,14 +166,6 @@ drawPenumbras = function(penumbras)
 
 end
 
-hullInLightRange = function(light, hull)
-  for i, point in ipairs(hull.points) do
-    if Util.distance(light.x, light.y, point.x, point.y) <= light.range then
-      return true
-    end
-  end
-end
-
 getHullsInRange = function(light, hulls)
 
   local hullsInRange = {}
@@ -184,6 +178,15 @@ getHullsInRange = function(light, hulls)
 
   return hullsInRange
 
+end
+
+hullInLightRange = function(light, hull)
+  for i, point in ipairs(hull.points) do
+    if Util.distance(light.x, light.y, point.x, point.y) <= light.range then
+      return true
+    end
+  end
+  return false
 end
 
 getShadowPoints = function(light, hulls)
@@ -238,6 +241,8 @@ getShadowPoints = function(light, hulls)
         anchorPoints = {hull.p2, hull.p4}
       elseif closestPoint == hull.p4 then
         anchorPoints = {hull.p1, hull.p3}
+      else
+        print('No Anchor Point')
       end
 
     end

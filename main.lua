@@ -16,11 +16,12 @@ for i=1, 10 do
   y = math.random(100, 600)
   width = math.random(10, 100)
   height = math.random(10, 100)
-  lightWorld:newHull(x, y, width, height)
+  --lightWorld:newHull(x, y, width, height)
 
 end
 
 local testHull = lightWorld:newHull(100, 100, 100, 100)
+testHull.debug = true
 
 local light = lightWorld:newLight(60, 50, 300)
 
@@ -45,7 +46,14 @@ end
 
 function love.update()
 
-  light:setLocation(love.mouse.getX()-translateX, love.mouse.getY()-translateY)
+  light:setPosition(love.mouse.getX()-translateX, love.mouse.getY()-translateY)
+
+  if love.keyboard.isDown('f') then
+    testHull:move(1, 1)
+  end
+  if love.keyboard.isDown('r') then
+    testHull:move(-1, -1)
+  end
 
   if love.keyboard.isDown('a') then
     translateX = translateX + 1
