@@ -46,27 +46,30 @@ function LightWorld:draw()
   -- love.graphics.clear(0, 0, 0, 0)
 
   --Draw each light
-  for i, light in ipairs(self.lights) do
+  love.graphics.push()
+    love.graphics.translate(-self.offsetX, -self.offsetY)
+    for i, light in ipairs(self.lights) do
 
-    if light.on then
+      if light.on then
 
-      hulls = getHullsInRange(light, self.hulls)
-      --shadowPoints, penumbraPoints = getShadowPoints(light, hulls)
-      shadowPoints = getShadowPoints(light, hulls)
-      love.graphics.setCanvas(self.lightCanvas)
-      love.graphics.stencil(function()
-        drawHullShadows(shadowPoints)
-      end, 'replace', 1)
-      love.graphics.setStencilTest('less', 1)
-      light:draw(self.lightCanvas, self.offsetX, self.offsetY)
-      love.graphics.setStencilTest()
-      -- love.graphics.setCanvas(self.penumbraCanvas)
-      -- love.graphics.setColor(255, 255, 255, 255)
-      -- drawPenumbras(penumbraPoints)
+        hulls = getHullsInRange(light, self.hulls)
+        --shadowPoints, penumbraPoints = getShadowPoints(light, hulls)
+        shadowPoints = getShadowPoints(light, hulls)
+        love.graphics.setCanvas(self.lightCanvas)
+        love.graphics.stencil(function()
+          drawHullShadows(shadowPoints)
+        end, 'replace', 1)
+        love.graphics.setStencilTest('less', 1)
+        light:draw(self.lightCanvas, self.offsetX, self.offsetY)
+        love.graphics.setStencilTest()
+        -- love.graphics.setCanvas(self.penumbraCanvas)
+        -- love.graphics.setColor(255, 255, 255, 255)
+        -- drawPenumbras(penumbraPoints)
+
+      end
 
     end
-
-  end
+  love.graphics.pop()
 
   --Draw penumbra canvas to light canvas
   -- love.graphics.setShader(Shaders.blur)
@@ -78,10 +81,7 @@ function LightWorld:draw()
   love.graphics.setCanvas()
   love.graphics.setColor(255, 255, 255, 255)
   love.graphics.setBlendMode('multiply', 'premultiplied')
-  love.graphics.push()
-    love.graphics.translate(self.offsetX, self.offsetY)
-    love.graphics.draw(self.lightCanvas)
-  love.graphics.pop()
+  love.graphics.draw(self.lightCanvas)
   love.graphics.setBlendMode('alpha')
 
 

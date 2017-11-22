@@ -27,7 +27,7 @@ function Light:draw(canvas, offsetX, offsetY)
       love.graphics.clear()
       love.graphics.setBlendMode('alpha')
       love.graphics.setColor(self.color)
-      love.graphics.circle('fill', self.range+offsetX, self.range+offsetY, self.range)
+      love.graphics.circle('fill', self.range, self.range, self.range)
   end
 
   love.graphics.setCanvas(canvas)

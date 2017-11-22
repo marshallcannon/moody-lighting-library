@@ -57,21 +57,18 @@ function love.update()
 
   if love.keyboard.isDown('a') then
     translateX = translateX + 1
-    lightWorld:translate(-translateX, -translateY)
   end
   if love.keyboard.isDown('d') then
     translateX = translateX - 1
-    lightWorld:translate(-translateX, -translateY)
   end
   if love.keyboard.isDown('w') then
     translateY = translateY + 1
-    lightWorld:translate(-translateX, -translateY)
   end
   if love.keyboard.isDown('s') then
     translateY = translateY - 1
-    lightWorld:translate(-translateX, -translateY)
   end
 
+  lightWorld:translate(translateX, translateY)
 
 end
 
