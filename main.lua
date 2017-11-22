@@ -49,10 +49,10 @@ function love.update()
   light:setPosition(love.mouse.getX()-translateX, love.mouse.getY()-translateY)
 
   if love.keyboard.isDown('f') then
-    testHull:move(1, 1)
+    testHull:setPosition(500, 500)
   end
   if love.keyboard.isDown('r') then
-    testHull:move(-1, -1)
+    testHull:setPosition(100, 100)
   end
 
   if love.keyboard.isDown('a') then

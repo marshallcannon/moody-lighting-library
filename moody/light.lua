@@ -48,6 +48,13 @@ function Light:setPosition(x, y)
 
 end
 
+function Light:move(x, y)
+
+  self.x = self.x + x
+  self.y = self.y + y
+
+end
+
 function Light:shouldCastShadows(value)
 
   self.castShadows = value

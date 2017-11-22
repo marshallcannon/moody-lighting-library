@@ -36,7 +36,7 @@ function Hull:toggle(value)
 end
 
 --Move to an absolute position
-function Hull:setLocation(x, y)
+function Hull:setPosition(x, y)
 
   self.x = x
   self.y = y
