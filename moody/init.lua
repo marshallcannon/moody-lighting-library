@@ -115,8 +115,8 @@ end
 
 function LightWorld:translate(x, y)
 
-  self.offsetX = self.offsetX + x
-  self.offsetY = self.offsetY + y
+  self.offsetX = x
+  self.offsetY = y
 
 end
 
