@@ -41,7 +41,7 @@ function LightWorld:draw()
 
   --Clear canvases
   love.graphics.setCanvas(self.lightCanvas)
-  love.graphics.clear(0, 0, 0, 255)
+  love.graphics.clear(self.ambient)
   -- love.graphics.setCanvas(self.penumbraCanvas)
   -- love.graphics.clear(0, 0, 0, 0)
 
@@ -250,6 +250,7 @@ getShadowPoints = function(light, hulls)
     if #anchorPoints > 0 then
       local umbra = {}
       local penumbra = {}
+      local closestPoint = getClosestPoint(light, hull)
 
       --Get main shadow polygon
       table.insert(umbra, anchorPoints[1])
@@ -257,6 +258,7 @@ getShadowPoints = function(light, hulls)
       table.insert(umbra, getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, light.range*1.5))
       table.insert(umbra, getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, light.range*1.5))
       table.insert(umbra, 4, getExtendedPoint(light.x, light.y, (umbra[3].x+umbra[4].x)/2, (umbra[3].y+umbra[4].y)/2, light.range*1.5))
+      table.insert(umbra, 2, closestPoint)
 
       --Get penumbra polygons
       -- table.insert(penumbra, anchorPoints[1])
