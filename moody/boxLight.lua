@@ -40,13 +40,16 @@ end
 
 function BoxLight:drawCanvas()
     
-    self.canvas = love.graphics.newCanvas(self.width, self.height)
-    love.graphics.setCanvas(self.canvas)
-    love.graphics.clear()
-    love.graphics.setBlendMode('alpha')
-    love.graphics.setColor(self.color)
-    love.graphics.rectangle('fill', 0, 0, self.width, self.height)
-    love.graphics.setCanvas()
+    love.graphics.push()
+        love.graphics.origin()
+        self.canvas = love.graphics.newCanvas(self.width, self.height)
+        love.graphics.setCanvas(self.canvas)
+        love.graphics.clear()
+        love.graphics.setBlendMode('alpha')
+        love.graphics.setColor(self.color)
+        love.graphics.rectangle('fill', 0, 0, self.width, self.height)
+        love.graphics.setCanvas()
+    love.graphics.pop()
 
 end
 

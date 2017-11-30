@@ -86,6 +86,12 @@ function LightWorld:draw()
       end
       self.staticStale = false
     end
+
+    --Draw static light canvas to light canvas
+    love.graphics.setCanvas(self.lightCanvas)
+    love.graphics.setBlendMode('add', 'premultiplied')
+    love.graphics.draw(self.staticLightCanvas)
+
   love.graphics.pop()
 
   --Draw penumbra canvas to light canvas
@@ -94,10 +100,7 @@ function LightWorld:draw()
   -- love.graphics.draw(self.penumbraCanvas)
   -- love.graphics.setShader()
 
-  --Draw static lights to light canvas
-  love.graphics.setCanvas(self.lightCanvas)
-  love.graphics.setBlendMode('add', 'premultiplied')
-  love.graphics.draw(self.staticLightCanvas)
+  
 
   --Draw light canvas
   love.graphics.setCanvas()

@@ -37,13 +37,16 @@ end
 
 function Light:drawCanvas()
 
-  self.canvas = love.graphics.newCanvas(self.range*2, self.range*2)
-  love.graphics.setCanvas(self.canvas)
-    love.graphics.clear()
-    love.graphics.setBlendMode('alpha')
-    love.graphics.setColor(self.color)
-    love.graphics.circle('fill', self.range, self.range, self.range)
-  love.graphics.setCanvas()
+  love.graphics.push()
+    love.graphics.origin()
+    self.canvas = love.graphics.newCanvas(self.range*2, self.range*2)
+    love.graphics.setCanvas(self.canvas)
+      love.graphics.clear()
+      love.graphics.setBlendMode('alpha')
+      love.graphics.setColor(self.color)
+      love.graphics.circle('fill', self.range, self.range, self.range)
+    love.graphics.setCanvas()
+  love.graphics.pop()
 
 end
 
