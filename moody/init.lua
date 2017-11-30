@@ -80,7 +80,9 @@ function LightWorld:draw()
       love.graphics.setCanvas(self.staticLightCanvas)
       love.graphics.clear()
       for i, light in ipairs(self.staticLights) do
-        light:draw()
+        if light.on then
+          light:draw()
+        end
       end
       self.staticStale = false
     end
@@ -117,9 +119,9 @@ function LightWorld:draw()
 
 end
 
-function LightWorld:newLight(x, y, mode, range, color)
+function LightWorld:newLight(mode, x, y, range, color)
 
-  local newLight = Light.new(x, y, range, color)
+  local newLight = Light.new(self, mode, x, y, range, color)
   if mode == 'dynamic' then
     table.insert(self.lights, newLight)
   else
@@ -130,9 +132,9 @@ function LightWorld:newLight(x, y, mode, range, color)
 
 end
 
-function LightWorld:newBoxLight(x, y, mode, width, height, color)
+function LightWorld:newBoxLight(mode, x, y, width, height, color)
 
-  local newLight = BoxLight.new(x, y, width, height, color)
+  local newLight = BoxLight.new(self, mode, x, y, width, height, color)
   if mode == 'dynamic' then
     table.insert(self.lights, newLight)
   else
@@ -145,7 +147,7 @@ end
 
 function LightWorld:newHull(x, y, width, height)
 
-  local newHull = Hull.new(x, y, width, height)
+  local newHull = Hull.new(world, x, y, width, height)
   table.insert(self.hulls, newHull)
   return newHull
 

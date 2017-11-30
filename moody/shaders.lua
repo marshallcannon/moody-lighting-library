@@ -26,12 +26,12 @@ Shaders.boxFade = love.graphics.newShader([[
     if(hDistance >= vDistance && hDistance > fadeDistance)
     {
       number adjustedDistance = fadeMax - (hDistance - fadeDistance);
-      pixel.a = 1/fadeMax * adjustedDistance;
+      pixel.a = pixel.a * (1/fadeMax * adjustedDistance);
     }
     else if(vDistance > hDistance && vDistance > fadeDistance)
     {
       number adjustedDistance = fadeMax - (vDistance - fadeDistance);
-      pixel.a = 1/fadeMax * adjustedDistance;
+      pixel.a = pixel.a * (1/fadeMax * adjustedDistance);
     }
     return pixel;
 

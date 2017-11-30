@@ -5,15 +5,17 @@ local Light = require(directory .. '/light')
 local BoxLight = {}
 BoxLight.__index = BoxLight
 
-function BoxLight.new(x, y, width, height, color)
+function BoxLight.new(world, mode, x, y, width, height, color)
 
     local self = setmetatable({}, BoxLight)
 
+    self.world = world
+    self.mode = mode
     self.x = x or 0
     self.y = y or 0
     self.width = width or 32
     self.height = height or 32
-    self.color = color or {255, 255, 255}
+    self.color = color or {255, 255, 255, 255}
     self.castShadows = false
     self.on = true
 
@@ -46,6 +48,18 @@ function BoxLight:drawCanvas()
     love.graphics.rectangle('fill', 0, 0, self.width, self.height)
     love.graphics.setCanvas()
 
+end
+
+function BoxLight:setColor(color)
+    self.color = color or {255, 255, 255, 255}
+    self:drawCanvas()
+    if self.mode == 'static' then self.world.staticStale = true end
+end
+
+function BoxLight:setIntensity(intensity)
+    self.color[4] = intensity
+    self:drawCanvas()
+    if self.mode == 'static' then self.world.staticStale = true end
 end
 
 function BoxLight:hullInRange(hull)

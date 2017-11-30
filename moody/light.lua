@@ -5,14 +5,16 @@ local Util = require(directory .. '/util')
 local Light = {}
 Light.__index = Light
 
-function Light.new(x, y, range, color)
+function Light.new(world, mode, x, y, range, color)
 
   local self = setmetatable({}, Light)
 
+  self.world = world
+  self.mode = mode
   self.x = x or 0
   self.y = y or 0
   self.range = range or 64
-  self.color = color or {255, 255, 255}
+  self.color = color or {255, 255, 255, 255}
   self.castShadows = false
   self.on = true
 
@@ -74,6 +76,22 @@ function Light:toggle(value)
     else self.on = true end
   end
 
+  if self.mode == 'static' then
+    self.world.staticStale = true
+  end
+
+end
+
+function Light:setColor(color)
+  self.color = color or {255, 255, 255, 255}
+  self:drawCanvas()
+  if self.mode == 'static' then self.world.staticStale = true end
+end
+
+function Light:setIntensity(intensity)
+  self.color[4] = intensity
+  self:drawCanvas()
+  if self.mode == 'static' then self.world.staticStale = true end
 end
 
 function Light:hullInRange(hull)
