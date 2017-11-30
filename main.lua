@@ -78,7 +78,7 @@ function love.mousepressed(x, y, button, isTouch)
     lightWorld:newLight(x-translateX, y-translateY, 'dynamic', 500, {255, 255, 255})
   end
   if button == 2 then
-    lightWorld:newLight(x-translateX, y-translateY, 'static', 500, {255, 255, 255})
+    lightWorld:newBoxLight(x-translateX, y-translateY, 'static', 300, 300, {255, 255, 255})
   end
   if button == 3 then
     testHull:toggle()

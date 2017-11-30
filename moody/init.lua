@@ -1,6 +1,7 @@
 local directory = string.gsub(...,"%.","/") or ""
 if string.len(directory) > 0 then directory = directory .. "/" end
 local Light = require(directory .. 'light')
+local BoxLight = require(directory .. 'boxLight')
 local Hull = require(directory .. 'hull')
 local Util = require(directory .. 'util')
 local Shaders = require(directory .. 'shaders')
@@ -131,6 +132,15 @@ end
 
 function LightWorld:newBoxLight(x, y, mode, width, height, color)
 
+  local newLight = BoxLight.new(x, y, width, height, color)
+  if mode == 'dynamic' then
+    table.insert(self.lights, newLight)
+  else
+    table.insert(self.staticLights, newLight)
+    self.staticStale = true
+  end
+  return newLight
+
 end
 
 function LightWorld:newHull(x, y, width, height)
@@ -199,22 +209,13 @@ getHullsInRange = function(light, hulls)
   local hullsInRange = {}
 
   for i, hull in ipairs(hulls) do
-    if hull.active and hullInLightRange(light, hull) then
+    if hull.active and light:hullInRange(hull) then
       table.insert(hullsInRange, hull)
     end
   end
 
   return hullsInRange
 
-end
-
-hullInLightRange = function(light, hull)
-  for i, point in ipairs(hull.points) do
-    if Util.distance(light.x, light.y, point.x, point.y) <= light.range then
-      return true
-    end
-  end
-  return false
 end
 
 getShadowPoints = function(light, hulls)
@@ -279,13 +280,14 @@ getShadowPoints = function(light, hulls)
       local umbra = {}
       local penumbra = {}
       local closestPoint = getClosestPoint(light, hull)
+      local lightSize = light.range or light.width + light.height
 
       --Get main shadow polygon
       table.insert(umbra, anchorPoints[1])
       table.insert(umbra, anchorPoints[2])
-      table.insert(umbra, getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, light.range*1.5))
-      table.insert(umbra, getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, light.range*1.5))
-      table.insert(umbra, 4, getExtendedPoint(light.x, light.y, (umbra[3].x+umbra[4].x)/2, (umbra[3].y+umbra[4].y)/2, light.range*1.5))
+      table.insert(umbra, getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, lightSize*1.5))
+      table.insert(umbra, getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, lightSize*1.5))
+      table.insert(umbra, 4, getExtendedPoint(light.x, light.y, (umbra[3].x+umbra[4].x)/2, (umbra[3].y+umbra[4].y)/2, lightSize*1.5))
       table.insert(umbra, 2, closestPoint)
 
       --Get penumbra polygons

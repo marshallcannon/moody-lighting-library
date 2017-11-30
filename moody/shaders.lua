@@ -14,6 +14,32 @@ Shaders.radialFade = love.graphics.newShader([[
 
 ]])
 
+Shaders.boxFade = love.graphics.newShader([[
+
+  vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ) {
+
+    number fadeDistance = 0.4;
+    number fadeMax = 0.5 - fadeDistance;
+    vec4 pixel = Texel(texture, texture_coords);
+    number hDistance = abs(texture_coords.x - 0.5);
+    number vDistance = abs(texture_coords.y - 0.5);
+    if(hDistance >= vDistance && hDistance > fadeDistance)
+    {
+      number adjustedDistance = fadeMax - (hDistance - fadeDistance);
+      pixel.a = 1/fadeMax * adjustedDistance;
+    }
+    else if(vDistance > hDistance && vDistance > fadeDistance)
+    {
+      number adjustedDistance = fadeMax - (vDistance - fadeDistance);
+      pixel.a = 1/fadeMax * adjustedDistance;
+    }
+    return pixel;
+
+  }
+
+
+]])
+
 Shaders.blur = love.graphics.newShader([[
 
   #define Quality 1.0

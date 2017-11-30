@@ -17,19 +17,44 @@ function BoxLight.new(x, y, width, height, color)
     self.castShadows = false
     self.on = true
 
+    self:drawCanvas()
+
     return self
 
 end
 
 setmetatable(BoxLight, Light)
 
-function Light:draw()
+function BoxLight:draw()
     
     local width, height = self.canvas:getDimensions()
     love.graphics.setColor(self.color)
     love.graphics.setBlendMode('alpha')
-    love.graphics.setShader(Shaders.radialFade)
+    love.graphics.setShader(Shaders.boxFade)
     love.graphics.draw(self.canvas, self.x-width/2, self.y-height/2)
     love.graphics.setShader()
 
 end
+
+function BoxLight:drawCanvas()
+    
+    self.canvas = love.graphics.newCanvas(self.width, self.height)
+    love.graphics.setCanvas(self.canvas)
+    love.graphics.clear()
+    love.graphics.setBlendMode('alpha')
+    love.graphics.setColor(self.color)
+    love.graphics.rectangle('fill', 0, 0, self.width, self.height)
+    love.graphics.setCanvas()
+
+end
+
+function BoxLight:hullInRange(hull)
+    for i, point in ipairs(hull.points) do
+        if math.abs(self.x - point.x) <= self.width/2 and math.abs(self.y - point.y) <= self.height/2 then
+            return true
+        end
+    end
+    return false
+end
+
+return BoxLight

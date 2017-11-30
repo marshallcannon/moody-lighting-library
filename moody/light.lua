@@ -1,5 +1,6 @@
 local directory = (...):match("^(.+)[%./][^%./]+") or ""
 local Shaders = require(directory .. '/shaders')
+local Util = require(directory .. '/util')
 
 local Light = {}
 Light.__index = Light
@@ -73,6 +74,15 @@ function Light:toggle(value)
     else self.on = true end
   end
 
+end
+
+function Light:hullInRange(hull)
+  for i, point in ipairs(hull.points) do
+    if Util.distance(self.x, self.y, point.x, point.y) <= self.range then
+      return true
+    end
+  end
+  return false
 end
 
 return Light
