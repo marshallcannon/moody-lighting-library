@@ -15,28 +15,31 @@ function Light.new(x, y, range, color)
   self.castShadows = false
   self.on = true
 
+  self:drawCanvas()
+
   return self
 
 end
 
-function Light:draw(canvas, offsetX, offsetY)
+function Light:draw()
 
-  if not self.canvas then
-    self.canvas = love.graphics.newCanvas(self.range*2, self.range*2)
-    love.graphics.setCanvas(self.canvas)
-      love.graphics.clear()
-      love.graphics.setBlendMode('alpha')
-      love.graphics.setColor(self.color)
-      love.graphics.circle('fill', self.range, self.range, self.range)
-  end
+  local width, height = self.canvas:getDimensions()
+  love.graphics.setColor(self.color)
+  love.graphics.setBlendMode('alpha')
+  love.graphics.setShader(Shaders.radialFade)
+  love.graphics.draw(self.canvas, self.x-width/2, self.y-height/2)
+  love.graphics.setShader()
 
-  love.graphics.setCanvas(canvas)
-    local width, height = self.canvas:getDimensions()
-    love.graphics.setColor(self.color)
+end
+
+function Light:drawCanvas()
+
+  self.canvas = love.graphics.newCanvas(self.range*2, self.range*2)
+  love.graphics.setCanvas(self.canvas)
+    love.graphics.clear()
     love.graphics.setBlendMode('alpha')
-    love.graphics.setShader(Shaders.radialFade)
-    love.graphics.draw(self.canvas, self.x-width/2, self.y-height/2)
-    love.graphics.setShader()
+    love.graphics.setColor(self.color)
+    love.graphics.circle('fill', self.range, self.range, self.range)
   love.graphics.setCanvas()
 
 end

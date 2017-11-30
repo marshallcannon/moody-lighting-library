@@ -1,39 +1,29 @@
 Moody = require 'moody'
 
-love.window.setMode(1920, 1080, {vsync=false, fullscreen=true})
+love.window.setMode(800, 600, {vsync=false, fullscreen=false})
 
-local lightWorld = Moody:new(1920, 1080)
+local lightWorld = Moody:new(800, 600)
 lightWorld.debug = true
 
 translateX = 0
 translateY = 0
 
--- math.randomseed(os.time())
--- for i=1, 20 do
---
---   local x, y, width, height
---   x = math.random(100, 1820)
---   y = math.random(100, 980)
---   width = math.random(10, 300)
---   height = math.random(10, 300)
---   lightWorld:newHull(x, y, width, height)
---
--- end
+math.randomseed(os.time())
+for i=1, 20 do
 
--- testHull = lightWorld:newHull(100, 100, 100, 100)
--- testHull.debug = true
+  local x, y, width, height
+  x = math.random(100, 1820)
+  y = math.random(100, 980)
+  width = math.random(10, 300)
+  height = math.random(10, 300)
+  lightWorld:newHull(x, y, width, height)
 
-lightWorld:newHull(200, 100, 80, 150)
-lightWorld:newHull(1200, 200, 220, 180)
-lightWorld:newHull(1100, 600, 200, 150)
-lightWorld:newHull(100, 800, 250, 80)
-lightWorld:newHull(800, 300, 100, 150)
-lightWorld:newHull(650, 600, 300, 40)
-lightWorld:newHull(800, 800, 100, 100)
-lightWorld:newHull(1300, 900, 200, 100)
-lightWorld:newHull(1000, 500, 50, 150)
+end
 
-local light = lightWorld:newLight(60, 50, 500)
+testHull = lightWorld:newHull(100, 100, 100, 100)
+testHull.debug = true
+
+local light = lightWorld:newLight(60, 50, 'dynamic', 500)
 
 function love.load()
 
@@ -85,10 +75,10 @@ end
 function love.mousepressed(x, y, button, isTouch)
 
   if button == 1 then
-    lightWorld:newLight(x-translateX, y-translateY, 500, {255, 255, 255})
+    lightWorld:newLight(x-translateX, y-translateY, 'dynamic', 500, {255, 255, 255})
   end
   if button == 2 then
-    light:toggle()
+    lightWorld:newLight(x-translateX, y-translateY, 'static', 500, {255, 255, 255})
   end
   if button == 3 then
     testHull:toggle()

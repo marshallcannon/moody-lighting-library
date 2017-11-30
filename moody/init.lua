@@ -21,14 +21,17 @@ function LightWorld:new(width, height, ambient)
   self.ambient = ambient or {0, 0, 0}
 
   self.lights = {}
+  self.staticLights = {}
   self.hulls = {}
 
   self.offsetX = 0
   self.offsetY = 0
 
   self.lightCanvas = love.graphics.newCanvas(self.width, self.height)
+  self.staticLightCanvas = love.graphics.newCanvas(self.width, self.height)
   --self.penumbraCanvas = love.graphics.newCanvas()
 
+  self.staticStale = true
   self.debug = false
 
   return self
@@ -48,6 +51,7 @@ function LightWorld:draw()
   --Draw each light
   love.graphics.push()
     love.graphics.translate(-self.offsetX, -self.offsetY)
+    --Dynamic Lights
     for i, light in ipairs(self.lights) do
 
       if light.on then
@@ -69,6 +73,16 @@ function LightWorld:draw()
       end
 
     end
+
+    --Static lights
+    if self.staticStale == true then
+      love.graphics.setCanvas(self.staticLightCanvas)
+      love.graphics.clear()
+      for i, light in ipairs(self.staticLights) do
+        light:draw()
+      end
+      self.staticStale = false
+    end
   love.graphics.pop()
 
   --Draw penumbra canvas to light canvas
@@ -76,6 +90,11 @@ function LightWorld:draw()
   -- love.graphics.setCanvas(self.lightCanvas)
   -- love.graphics.draw(self.penumbraCanvas)
   -- love.graphics.setShader()
+
+  --Draw static lights to light canvas
+  love.graphics.setCanvas(self.lightCanvas)
+  love.graphics.setBlendMode('add', 'premultiplied')
+  love.graphics.draw(self.staticLightCanvas)
 
   --Draw light canvas
   love.graphics.setCanvas()
@@ -97,11 +116,20 @@ function LightWorld:draw()
 
 end
 
-function LightWorld:newLight(x, y, range, color)
+function LightWorld:newLight(x, y, mode, range, color)
 
   local newLight = Light.new(x, y, range, color)
-  table.insert(self.lights, newLight)
+  if mode == 'dynamic' then
+    table.insert(self.lights, newLight)
+  else
+    table.insert(self.staticLights, newLight)
+    self.staticStale = true
+  end
   return newLight
+
+end
+
+function LightWorld:newBoxLight(x, y, mode, width, height, color)
 
 end
 
