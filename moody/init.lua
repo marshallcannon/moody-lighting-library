@@ -51,7 +51,7 @@ function LightWorld:draw()
 
   --Draw each light
   love.graphics.push()
-    love.graphics.translate(-self.offsetX, -self.offsetY)
+    love.graphics.origin()
     --Dynamic Lights
     for i, light in ipairs(self.lights) do
 
@@ -153,13 +153,6 @@ function LightWorld:newHull(x, y, width, height)
   local newHull = Hull.new(world, x, y, width, height)
   table.insert(self.hulls, newHull)
   return newHull
-
-end
-
-function LightWorld:translate(x, y)
-
-  self.offsetX = x
-  self.offsetY = y
 
 end
 

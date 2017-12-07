@@ -23,7 +23,7 @@ translateY = 0
 -- testHull = lightWorld:newHull(100, 100, 100, 100)
 -- testHull.debug = true
 
-local light = lightWorld:newLight('dynamic', 60, 50, 500)
+local light = lightWorld:newLight('dynamic', 60, 50, 200)
 
 function love.load()
 
@@ -68,14 +68,12 @@ function love.update()
     translateY = translateY - 1
   end
 
-  lightWorld:translate(translateX, translateY)
-
 end
 
 function love.mousepressed(x, y, button, isTouch)
 
   if button == 1 then
-    lightWorld:newLight('dynamic', x-translateX, y-translateY, 500, {255, 255, 255})
+    lightWorld:newLight('dynamic', x-translateX, y-translateY, 200, {255, 255, 255})
   end
   if button == 2 then
     boxLight = lightWorld:newBoxLight('static', x-translateX, y-translateY, 100, 50, {255, 255, 255})
