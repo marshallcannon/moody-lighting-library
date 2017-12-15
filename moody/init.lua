@@ -2,12 +2,13 @@ local directory = string.gsub(...,"%.","/") or ""
 if string.len(directory) > 0 then directory = directory .. "/" end
 local Light = require(directory .. 'light')
 local BoxLight = require(directory .. 'boxLight')
+local BeamLight = require(directory .. 'beamLight')
 local Hull = require(directory .. 'hull')
 local Util = require(directory .. 'util')
 local Shaders = require(directory .. 'shaders')
 
 --Local function declarations
-local drawHullShadows, inLightRange, getShadowPoints, getExtendedPoint, getClosestPoint, getHullsInRange, drawPenumbras
+local drawHullShadows, inLightRange, getShadowPoints, getClosestPoint, getHullsInRange, drawPenumbras
 
 local LightWorld = {}
 LightWorld.__index = LightWorld
@@ -138,6 +139,19 @@ end
 function LightWorld:newBoxLight(mode, x, y, width, height, color)
 
   local newLight = BoxLight.new(self, mode, x, y, width, height, color)
+  if mode == 'dynamic' then
+    table.insert(self.lights, newLight)
+  else
+    table.insert(self.staticLights, newLight)
+    self.staticStale = true
+  end
+  return newLight
+
+end
+
+function LightWorld:newBeamLight(mode, x, y, range, width, angle, color)
+
+  local newLight = BeamLight.new(self, mode, x, y, range, width, angle, color)
   if mode == 'dynamic' then
     table.insert(self.lights, newLight)
   else
@@ -283,18 +297,18 @@ getShadowPoints = function(light, hulls)
       --Get main shadow polygon
       table.insert(umbra, anchorPoints[1])
       table.insert(umbra, anchorPoints[2])
-      table.insert(umbra, getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, lightSize*1.5))
-      table.insert(umbra, getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, lightSize*1.5))
-      table.insert(umbra, 4, getExtendedPoint(light.x, light.y, (umbra[3].x+umbra[4].x)/2, (umbra[3].y+umbra[4].y)/2, lightSize*1.5))
+      table.insert(umbra, Util.getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, lightSize*1.5))
+      table.insert(umbra, Util.getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, lightSize*1.5))
+      table.insert(umbra, 4, Util.getExtendedPoint(light.x, light.y, (umbra[3].x+umbra[4].x)/2, (umbra[3].y+umbra[4].y)/2, lightSize*1.5))
       table.insert(umbra, 2, closestPoint)
 
       --Get penumbra polygons
       -- table.insert(penumbra, anchorPoints[1])
-      -- table.insert(penumbra, getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, light.range*1.5))
-      -- table.insert(penumbra, getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, light.range*1.5, -0.17))
+      -- table.insert(penumbra, Util.getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, light.range*1.5))
+      -- table.insert(penumbra, Util.getExtendedPoint(light.x, light.y, anchorPoints[1].x, anchorPoints[1].y, light.range*1.5, -0.17))
       -- table.insert(penumbra, anchorPoints[2])
-      -- table.insert(penumbra, getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, light.range*1.5))
-      -- table.insert(penumbra, getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, light.range*1.5, 0.17))
+      -- table.insert(penumbra, Util.getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, light.range*1.5))
+      -- table.insert(penumbra, Util.getExtendedPoint(light.x, light.y, anchorPoints[2].x, anchorPoints[2].y, light.range*1.5, 0.17))
 
       --Add new shadows
       table.insert(shadowPoints, umbra)
@@ -306,21 +320,6 @@ getShadowPoints = function(light, hulls)
 
   --return shadowPoints, penumbraPoints
   return shadowPoints
-
-end
-
---Gets point along vector at distance
-getExtendedPoint = function(x1, y1, x2, y2, distance, angleOffset)
-
-  if not angleOffset then
-    local x, y = Util.normalize(x2-x1, y2-y1)
-    return {x=x1+x*distance, y=y1+y*distance}
-  else
-    local x, y = Util.normalize(x2-x1, y2-y1)
-    --local distance = Util.distance(x1, y1, x2, y2)
-    local angle = Util.angle(x1, y1, x2, y2)
-    return {x=x1+x*distance*math.cos(angleOffset), y=y1+y*distance*math.sin(angleOffset)}
-  end
 
 end
 

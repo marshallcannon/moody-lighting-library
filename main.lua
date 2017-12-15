@@ -8,22 +8,22 @@ lightWorld.debug = true
 translateX = 0
 translateY = 0
 
--- math.randomseed(os.time())
--- for i=1, 20 do
+math.randomseed(os.time())
+for i=1, 20 do
 
---   local x, y, width, height
---   x = math.random(100, 1820)
---   y = math.random(100, 980)
---   width = math.random(10, 300)
---   height = math.random(10, 300)
---   lightWorld:newHull(x, y, width, height)
+  local x, y, width, height
+  x = math.random(100, 1820)
+  y = math.random(100, 980)
+  width = math.random(10, 300)
+  height = math.random(10, 300)
+  lightWorld:newHull(x, y, width, height)
 
--- end
+end
 
--- testHull = lightWorld:newHull(100, 100, 100, 100)
--- testHull.debug = true
+testHull = lightWorld:newHull(100, 100, 100, 100)
+testHull.debug = true
 
-local light = lightWorld:newLight('dynamic', 60, 50, 200)
+local light = lightWorld:newBeamLight('dynamic', 60, 50, 200, math.rad(45), math.rad(97))
 
 function love.load()
 
@@ -47,6 +47,7 @@ end
 function love.update()
 
   light:setPosition(love.mouse.getX()-translateX, love.mouse.getY()-translateY)
+  light:rotate(math.rad(0.5))
 
   if love.keyboard.isDown('f') then
     testHull:setPosition(500, 500)
