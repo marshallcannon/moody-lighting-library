@@ -5,8 +5,10 @@ Shaders.radialFade = love.graphics.newShader([[
   vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ) {
 
     vec4 pixel = Texel(texture, texture_coords);
-    number distance = 1 - pow((pow(abs(texture_coords.x - 0.5), 2) + pow(abs(texture_coords.y - 0.5), 2) ), 0.5) * 2;
-    pixel.a = distance;
+    if(pixel.a > 0) {
+      number distance = 1 - pow((pow(abs(texture_coords.x - 0.5), 2) + pow(abs(texture_coords.y - 0.5), 2) ), 0.5) * 2;
+      pixel.a = distance;
+    }
     return pixel;
 
   }
