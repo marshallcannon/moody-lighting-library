@@ -6,7 +6,7 @@ local Util = require(directory .. '/util')
 local BeamLight = {}
 BeamLight.__index = BeamLight
 
-function BeamLight.new(world, mode, x, y, range, width, angle, color)
+function BeamLight.new(world, mode, x, y, stature, range, width, angle, color)
 
     local self = setmetatable({}, BeamLight)
 
@@ -14,6 +14,7 @@ function BeamLight.new(world, mode, x, y, range, width, angle, color)
     self.mode = mode
     self.x = x or 0
     self.y = y or 0
+    self.stature = stature
     self.range = range or 50
     self.width = width or 1.0472
     self.angle = angle or 0
@@ -35,7 +36,7 @@ function BeamLight:draw()
   love.graphics.setColor(self.color)
   love.graphics.setBlendMode('alpha')
   love.graphics.setShader(Shaders.radialFade)
-  love.graphics.draw(self.canvas, self.x, self.y, self.angle, 1, 1, self.range, self.range)
+  love.graphics.draw(self.canvas, self.x, self.y-self.stature, self.angle, 1, 1, self.range, self.range)
   love.graphics.setShader()
 
 end

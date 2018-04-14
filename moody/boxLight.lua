@@ -5,7 +5,7 @@ local Light = require(directory .. '/light')
 local BoxLight = {}
 BoxLight.__index = BoxLight
 
-function BoxLight.new(world, mode, x, y, width, height, color)
+function BoxLight.new(world, mode, x, y, stature, width, height, color)
 
     local self = setmetatable({}, BoxLight)
 
@@ -13,6 +13,7 @@ function BoxLight.new(world, mode, x, y, width, height, color)
     self.mode = mode
     self.x = x or 0
     self.y = y or 0
+    self.stature = stature
     self.width = width or 32
     self.height = height or 32
     self.color = color or {255, 255, 255, 255}
@@ -33,7 +34,7 @@ function BoxLight:draw()
     love.graphics.setColor(self.color)
     love.graphics.setBlendMode('alpha')
     love.graphics.setShader(Shaders.boxFade)
-    love.graphics.draw(self.canvas, self.x-width/2, self.y-height/2)
+    love.graphics.draw(self.canvas, self.x-width/2, self.y-height/2-self.stature)
     love.graphics.setShader()
 
 end

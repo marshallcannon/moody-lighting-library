@@ -1,7 +1,7 @@
 local Hull = {}
 Hull.__index = Hull
 
-function Hull.new(world, x, y, width, height)
+function Hull.new(world, x, y, width, height, stature)
 
   local self = setmetatable({}, Hull)
 
@@ -10,6 +10,7 @@ function Hull.new(world, x, y, width, height)
   self.y = y or 0
   self.width = width or 16
   self.height = height or 16
+  self.stature = stature or 0
 
   self.active = true
 

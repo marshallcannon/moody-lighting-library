@@ -5,7 +5,7 @@ local Util = require(directory .. '/util')
 local Light = {}
 Light.__index = Light
 
-function Light.new(world, mode, x, y, range, color)
+function Light.new(world, mode, x, y, stature, range, color)
 
   local self = setmetatable({}, Light)
 
@@ -13,6 +13,7 @@ function Light.new(world, mode, x, y, range, color)
   self.mode = mode
   self.x = x or 0
   self.y = y or 0
+  self.stature = stature
   self.range = range or 64
   self.color = color or {255, 255, 255, 255}
   self.castShadows = false
@@ -30,7 +31,7 @@ function Light:draw()
   love.graphics.setColor(self.color)
   love.graphics.setBlendMode('alpha')
   love.graphics.setShader(Shaders.radialFade)
-  love.graphics.draw(self.canvas, self.x-width/2, self.y-height/2)
+  love.graphics.draw(self.canvas, self.x-width/2, self.y-height/2-self.stature)
   love.graphics.setShader()
 
 end
