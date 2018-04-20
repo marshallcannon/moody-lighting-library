@@ -25,11 +25,11 @@ function LightWorld:new(width, height, ambient)
   self.staticLights = {}
   self.hulls = {}
   self.imageHulls = {}
+  self.rooms = {}
 
   self.lightCanvas = love.graphics.newCanvas(self.width, self.height)
   self.staticLightCanvas = love.graphics.newCanvas(self.width, self.height)
 
-  self.staticStale = true
   self.debug = false
 
   return self
@@ -133,7 +133,7 @@ function LightWorld:newLight(mode, x, y, stature, range, color)
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self.staticStale = true
+    self:staticStale()
   end
   return newLight
 
@@ -146,7 +146,7 @@ function LightWorld:newBeamLight(mode, x, y, stature, range, width, angle, color
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self.staticStale = true
+    self:staticStale()
   end
   return newLight
 
@@ -159,7 +159,7 @@ function LightWorld:newBoxLight(mode, x, y, stature, width, height, color)
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self.staticStale = true
+    self:staticStale()
   end
   return newLight
 
@@ -184,7 +184,16 @@ end
 function LightWorld:newRoom(x, y, width, height)
 
   local newRoom = Room.new(self, x, y, width, height)
+  table.insert(self.rooms, newRoom)
   return newRoom
+
+end
+
+function LightWorld:staticStale()
+
+  for i, room in ipairs(self.rooms) do
+    room.staticStale = true
+  end
 
 end
 

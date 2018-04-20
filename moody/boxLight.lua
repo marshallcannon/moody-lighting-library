@@ -9,6 +9,7 @@ function BoxLight.new(world, mode, x, y, stature, width, height, color)
 
     local self = setmetatable({}, BoxLight)
 
+    self.type = 'BoxLight'
     self.world = world
     self.mode = mode
     self.x = x or 0
@@ -56,13 +57,13 @@ end
 function BoxLight:setColor(color)
     self.color = color or {255, 255, 255, 255}
     self:drawCanvas()
-    if self.mode == 'static' then self.world.staticStale = true end
+    if self.mode == 'static' then self.world:staticStale() end
 end
 
 function BoxLight:setIntensity(intensity)
     self.color[4] = intensity
     self:drawCanvas()
-    if self.mode == 'static' then self.world.staticStale = true end
+    if self.mode == 'static' then self.world:staticStale() end
 end
 
 function BoxLight:hullInRange(hull)

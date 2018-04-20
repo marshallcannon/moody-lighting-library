@@ -9,6 +9,7 @@ function Light.new(world, mode, x, y, stature, range, color)
 
   local self = setmetatable({}, Light)
 
+  self.type = 'Light'
   self.world = world
   self.mode = mode
   self.x = x or 0
@@ -74,7 +75,7 @@ function Light:toggle(value)
   end
 
   if self.mode == 'static' then
-    self.world.staticStale = true
+    self.world:staticStale()
   end
 
 end

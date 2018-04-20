@@ -10,6 +10,7 @@ function BeamLight.new(world, mode, x, y, stature, range, width, angle, color)
 
     local self = setmetatable({}, BeamLight)
 
+    self.type = 'BeamLight'
     self.world = world
     self.mode = mode
     self.x = x or 0

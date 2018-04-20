@@ -17,6 +17,7 @@ function Room.new(world, x, y, width, height)
 
   self.lightCanvas = love.graphics.newCanvas(self.width, self.height)
   self.staticLightCanvas = love.graphics.newCanvas(self.width, self.height)
+  self.staticStale = true
 
   self.debug = false
 
@@ -102,21 +103,22 @@ function Room:draw()
     end
 
     --Static lights
-    -- if self.world.staticStale == true then
-    --   love.graphics.setCanvas(self.staticLightCanvas)
-    --   love.graphics.clear()
-    --   for i, light in ipairs(self.staticLights) do
-    --     if light.on then
-    --       light:draw()
-    --     end
-    --   end
-    --   self.world.staticStale = false
-    -- end
+    if self.staticStale == true then
+      love.graphics.setCanvas(self.staticLightCanvas)
+      love.graphics.clear()
+      for i, light in ipairs(self.world.staticLights) do
+        if light.on and self:lightInRange(light) then
+          light:draw()
+        end
+      end
+      self.staticStale = false
+    end
 
     --Draw static light canvas to light canvas
-    -- love.graphics.setCanvas(self.lightCanvas)
-    -- love.graphics.setBlendMode('add', 'premultiplied')
-    -- love.graphics.draw(self.staticLightCanvas)
+    love.graphics.translate(self.x, self.y)
+    love.graphics.setCanvas(self.lightCanvas)
+    love.graphics.setBlendMode('add', 'premultiplied')
+    love.graphics.draw(self.staticLightCanvas)
 
   love.graphics.pop()
 
@@ -133,18 +135,31 @@ function Room:lightInRange(light)
 
   local lightX, lightY = light.x, light.y-light.stature
 
-  if lightX >= self.x and lightY >= self.y and lightX <= self.x+self.width and lightY <= self.y+self.height then
-    return true
-  else
-    if Util.distanceToLine(lightX, lightY, self.x, self.y, self.x+self.width, self.y) <= light.range then
-      return true
-    elseif Util.distanceToLine(lightX, lightY, self.x+self.width, self.y, self.x+self.width, self.y+self.height) <= light.range then
-      return true
-    elseif Util.distanceToLine(lightX, lightY, self.x+self.width, self.y+self.height, self.x, self.y+self.height) <= light.range then
-      return true
-    elseif Util.distanceToLine(lightX, lightY, self.x, self.y+self.height, self.x, self.y) <= light.range then
+  if light.type == 'BoxLight' then
+
+    if light.x < self.x + self.width and
+    light.x + light.width > self.x and
+    light.y < self.y + self.height and
+    light.y + light.width > self.y then
       return true
     end
+
+  else
+
+    if lightX >= self.x and lightY >= self.y and lightX <= self.x+self.width and lightY <= self.y+self.height then
+      return true
+    else
+      if Util.distanceToLine(lightX, lightY, self.x, self.y, self.x+self.width, self.y) <= light.range then
+        return true
+      elseif Util.distanceToLine(lightX, lightY, self.x+self.width, self.y, self.x+self.width, self.y+self.height) <= light.range then
+        return true
+      elseif Util.distanceToLine(lightX, lightY, self.x+self.width, self.y+self.height, self.x, self.y+self.height) <= light.range then
+        return true
+      elseif Util.distanceToLine(lightX, lightY, self.x, self.y+self.height, self.x, self.y) <= light.range then
+        return true
+      end
+    end
+
   end
 
   return false
