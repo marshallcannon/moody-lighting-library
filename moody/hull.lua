@@ -13,14 +13,13 @@ function Hull.new(world, x, y, width, height, stature)
   self.stature = stature or 0
 
   self.active = true
+  self.transparent = false
 
   self.p1 = {x = self.x, y = self.y}
   self.p2 = {x = self.x+self.width, y = self.y}
   self.p3 = {x = self.x+self.width, y = self.y+self.height}
   self.p4 = {x = self.x, y = self.y+self.height}
   self.points = {self.p1, self.p2, self.p3, self.p4}
-
-  self.debug = false
 
   return self
 
@@ -34,6 +33,12 @@ function Hull:toggle(value)
     if self.active then self.active = false
     else self.active = true end
   end
+
+end
+
+function Hull:setTransparent(value)
+
+  self.transparent = value
 
 end
 
@@ -58,6 +63,12 @@ function Hull:move(x, y)
   self.p2.x = self.x+self.width; self.p2.y = self.y
   self.p3.x = self.x+self.width; self.p3.y = self.y+self.height
   self.p4.x = self.x; self.p4.y = self.y+self.height
+
+end
+
+function Hull:getCenter()
+
+  return self.x+self.width/2, self.y+self.height/2
 
 end
 

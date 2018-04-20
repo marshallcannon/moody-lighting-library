@@ -20,6 +20,7 @@ end
 --Gets point along vector at distance. Cannot be shorter that distance between points.
 Util.getExtendedPoint = function(x1, y1, x2, y2, distance, angleOffset)
 
+  distance = distance or Util.distance(x1, y1, x2, y2)
   local pointDistance = Util.distance(x1, y1, x2, y2)
   if pointDistance > distance then
     distance = pointDistance+1
@@ -74,8 +75,7 @@ Util.getShadowTriangles = function(light, hulls)
 
     if shadowShapes then
       for i, shadowShape in ipairs(shadowShapes) do
-        local splitCoordinates = Util.splitCoordinates(shadowShape)
-        local triangles = love.math.triangulate(splitCoordinates)
+        local triangles = love.math.triangulate(shadowShape)
         for i, triangle in ipairs(triangles) do
           table.insert(shadowTriangles, triangle)
         end
@@ -83,8 +83,7 @@ Util.getShadowTriangles = function(light, hulls)
     end
     if lightShapes then
       for i, lightShape in ipairs(lightShapes) do
-        local splitCoordinates = Util.splitCoordinates(lightShape)
-        local triangles = love.math.triangulate(splitCoordinates)
+        local triangles = love.math.triangulate(lightShape)
         for i, triangle in ipairs(triangles) do
           table.insert(lightTriangles, triangle)
         end
@@ -109,10 +108,14 @@ Util.getShadowShapes = function(light, hull)
   local lightRelativePosition = Util.getLightRelativePosition(light, hull)
   local basePoints, extendedPoints, lightPoints = {}, {}, {}
   local addCorner = false
+  local canBeTransparent = hull.transparent
 
   if lightRelativePosition == 'n' then
     basePoints[1] = {hull.p1, hull.p2}
-    extendedPoints[1] = {hull.p2, hull.p1}
+    extendedPoints[1] = {hull.p2, {x=light.x, y=hull.p2.y}, hull.p1}
+    if not hull.transparent then
+      basePoints[2] = {hull.p1, hull.p2, {x=hull.p2.x, y=hull.p2.y-hull.stature}, {x=hull.p1.x, y=hull.p1.y-hull.stature}}
+    end
   elseif lightRelativePosition == 'e' then
     basePoints[1] = {hull.p2, hull.p3}
     extendedPoints[1] = {hull.p3, hull.p2}
@@ -127,6 +130,9 @@ Util.getShadowShapes = function(light, hull)
     basePoints[1] = {hull.p1, hull.p4, hull.p3}
     extendedPoints[1] = {hull.p3, hull.p4, hull.p1}
     basePoints[1].addCorner = true
+    if not hull.transparent then
+      basePoints[2] = {hull.p1, hull.p2, {x=hull.p2.x, y=hull.p2.y-hull.stature}, {x=hull.p1.x, y=hull.p1.y-hull.stature}}
+    end
   elseif lightRelativePosition == 'se' then
     basePoints[1] = {hull.p4, hull.p1, hull.p2}
     extendedPoints[1] = {hull.p2, hull.p1, hull.p4}
@@ -139,6 +145,9 @@ Util.getShadowShapes = function(light, hull)
     basePoints[1] = {hull.p2, hull.p3, hull.p4}
     extendedPoints[1] = {hull.p4, hull.p3, hull.p2}
     basePoints[1].addCorner = true
+    if not hull.transparent then
+      basePoints[2] = {hull.p1, hull.p2, {x=hull.p2.x, y=hull.p2.y-hull.stature}, {x=hull.p1.x, y=hull.p1.y-hull.stature}}
+    end
   elseif lightRelativePosition == 'inside' then
     basePoints[1] = {}
     extendedPoints[1] = {{x=hull.p1.x, y=hull.p1.y-hull.stature}, {x=hull.p2.x, y=hull.p2.y-hull.stature}, {x=hull.p3.x, y=hull.p3.y-hull.stature}, {x=hull.p4.x, y=hull.p4.y-hull.stature}}
@@ -150,7 +159,7 @@ Util.getShadowShapes = function(light, hull)
   --Show/Hide the top of the hull
   if limitShadow then
     table.insert(lightPoints, {{x=hull.p1.x, y=hull.p1.y-hull.stature}, {x=hull.p2.x, y=hull.p2.y-hull.stature}, {x=hull.p3.x, y=hull.p3.y-hull.stature}, {x=hull.p4.x, y=hull.p4.y-hull.stature}})
-  else
+  elseif not hull.transparent then
     table.insert(basePoints, {{x=hull.p1.x, y=hull.p1.y-hull.stature}, {x=hull.p2.x, y=hull.p2.y-hull.stature}, {x=hull.p3.x, y=hull.p3.y-hull.stature}, {x=hull.p4.x, y=hull.p4.y-hull.stature}})
   end
 
@@ -169,16 +178,21 @@ Util.getShadowShapes = function(light, hull)
     for i, bPoints in ipairs(basePoints) do
       local shape = {}
       for j, shadowPoint in ipairs(bPoints) do
-        table.insert(shape, shadowPoint)
+        table.insert(shape, shadowPoint.x)
+        table.insert(shape, shadowPoint.y)
       end
       if extendedPoints[i] then
         for k, extendedPoint in ipairs(extendedPoints[i]) do
-          table.insert(shape, Util.getExtendedPoint(light.x, light.y, extendedPoint.x, extendedPoint.y, shadowLength))
+          local extendedPoint = Util.getExtendedPoint(light.x, light.y, extendedPoint.x, extendedPoint.y, shadowLength)
+          table.insert(shape, extendedPoint.x)
+          table.insert(shape, extendedPoint.y)
         end
       end
       
       if bPoints.addCorner then
-        shape[2] = Util.getClosestPoint(light, hull)
+        local closestPoint = Util.getClosestPoint(light, hull)
+        shape[3] = closestPoint.x
+        shape[4] = closestPoint.y
       end
 
       table.insert(umbras, shape)
@@ -187,7 +201,8 @@ Util.getShadowShapes = function(light, hull)
     for i, lPoints in ipairs(lightPoints) do
       local shape = {}
       for j, lightPoint in ipairs(lPoints) do
-        table.insert(shape, lightPoint)
+        table.insert(shape, lightPoint.x)
+        table.insert(shape, lightPoint.y)
       end
       table.insert(lightAreas, shape)
     end
@@ -286,6 +301,53 @@ Util.splitCoordinates = function(coordinates)
   end
 
   return splitCoordinates
+
+end
+
+Util.distanceToLine = function(x, y, x1, y1, x2, y2)
+
+  local A = x - x1
+  local B = y - y1
+  local xLength = x2 - x1
+  local yLength = y2 - y1
+
+  local dot = A * xLength + B * yLength
+  local len_sq = xLength * xLength + yLength * yLength
+  local param = -1
+  if len_sq ~= 0 then
+      param = dot / len_sq
+  end
+
+  local xx, yy
+
+  if param < 0 then
+    xx = x1
+    yy = y1
+  elseif param > 1 then
+    xx = x2
+    yy = y2
+  else
+    xx = x1 + param * xLength
+    yy = y1 + param * yLength
+  end
+
+  local dx = x - xx
+  local dy = y - yy
+  return math.sqrt(dx * dx + dy * dy)
+
+end
+
+Util.getShadowLength = function(light, hull)
+
+  if hull.stature == 0 or light.stature <= hull.stature then
+    --Should be an infinitely long shadow
+    return 1000
+  end
+
+  local angle = math.atan(Util.distance(light.x, light.y, hull:getCenter())/(light.stature-hull.stature))
+  local hypotenuse = hull.stature / math.cos(angle)
+
+  return math.sqrt(hypotenuse^2 - hull.stature^2)
 
 end
 

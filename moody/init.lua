@@ -4,6 +4,8 @@ local Light = require(directory .. 'light')
 local BoxLight = require(directory .. 'boxLight')
 local BeamLight = require(directory .. 'beamLight')
 local Hull = require(directory .. 'hull')
+local ImageHull = require(directory .. 'imageHull')
+local Room = require(directory .. 'room')
 local Util = require(directory .. 'util')
 local Shaders = require(directory .. 'shaders')
 
@@ -22,9 +24,7 @@ function LightWorld:new(width, height, ambient)
   self.lights = {}
   self.staticLights = {}
   self.hulls = {}
-
-  self.offsetX = 0
-  self.offsetY = 0
+  self.imageHulls = {}
 
   self.lightCanvas = love.graphics.newCanvas(self.width, self.height)
   self.staticLightCanvas = love.graphics.newCanvas(self.width, self.height)
@@ -38,9 +38,9 @@ end
 
 function LightWorld:draw()
 
-  local hulls, shadowTriangles, lightTriangles
+  local hulls, imageHulls, shadowTriangles, lightTriangles
 
-  --Clear canvases
+  --Clear canvas
   love.graphics.setCanvas(self.lightCanvas)
   love.graphics.clear(self.ambient)
 
@@ -52,6 +52,7 @@ function LightWorld:draw()
 
       if light.on then
 
+        --Basic Hulls
         hulls = Util.getHullsInRange(light, self.hulls)
         shadowTriangles, lightTriangles = Util.getShadowTriangles(light, hulls)
         love.graphics.setCanvas(self.lightCanvas)
@@ -61,6 +62,11 @@ function LightWorld:draw()
         love.graphics.stencil(function()
           Util.drawHullShadows(lightTriangles)
         end, 'replace', 0, true)
+
+        --Image Hulls
+        imageHulls = Util.getHullsInRange(light, self.imageHulls)
+
+        --Draw Light
         love.graphics.setStencilTest('less', 1)
         light:draw(self.lightCanvas, self.offsetX, self.offsetY)
         love.graphics.setStencilTest()
@@ -133,19 +139,6 @@ function LightWorld:newLight(mode, x, y, stature, range, color)
 
 end
 
-function LightWorld:newBoxLight(mode, x, y, stature, width, height, color)
-
-  local newLight = BoxLight.new(self, mode, x, y, stature, width, height, color)
-  if mode == 'dynamic' then
-    table.insert(self.lights, newLight)
-  else
-    table.insert(self.staticLights, newLight)
-    self.staticStale = true
-  end
-  return newLight
-
-end
-
 function LightWorld:newBeamLight(mode, x, y, stature, range, width, angle, color)
 
   local newLight = BeamLight.new(self, mode, x, y, stature, range, width, angle, color)
@@ -159,11 +152,39 @@ function LightWorld:newBeamLight(mode, x, y, stature, range, width, angle, color
 
 end
 
+function LightWorld:newBoxLight(mode, x, y, stature, width, height, color)
+
+  local newLight = BoxLight.new(self, mode, x, y, stature, width, height, color)
+  if mode == 'dynamic' then
+    table.insert(self.lights, newLight)
+  else
+    table.insert(self.staticLights, newLight)
+    self.staticStale = true
+  end
+  return newLight
+
+end
+
 function LightWorld:newHull(x, y, width, height, stature)
 
-  local newHull = Hull.new(world, x, y, width, height, stature)
+  local newHull = Hull.new(self, x, y, width, height, stature)
   table.insert(self.hulls, newHull)
   return newHull
+
+end
+
+function LightWorld:newImageHull(x, y, image, width, height, stature)
+
+  local newHull = ImageHull.new(self, x, y, image, width, height, stature)
+  table.insert(self.imageHulls, newHull)
+  return newHull
+
+end
+
+function LightWorld:newRoom(x, y, width, height)
+
+  local newRoom = Room.new(self, x, y, width, height)
+  return newRoom
 
 end
 

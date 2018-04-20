@@ -16,7 +16,6 @@ function Light.new(world, mode, x, y, stature, range, color)
   self.stature = stature
   self.range = range or 64
   self.color = color or {255, 255, 255, 255}
-  self.castShadows = false
   self.on = true
 
   self:drawCanvas()
@@ -65,12 +64,6 @@ function Light:move(x, y)
 
 end
 
-function Light:shouldCastShadows(value)
-
-  self.castShadows = value
-
-end
-
 function Light:toggle(value)
 
   if value ~= nil then
@@ -99,12 +92,21 @@ function Light:setIntensity(intensity)
 end
 
 function Light:hullInRange(hull)
-  for i, point in ipairs(hull.points) do
-    if Util.distance(self.x, self.y, point.x, point.y) <= self.range then
+
+  if hull.points then
+    for i, point in ipairs(hull.points) do
+      if Util.distance(self.x, self.y, point.x, point.y) <= self.range then
+        return true
+      end
+    end
+  else
+    if Util.distance(self.x, self.y-self.stature, hull.x, hull.y) <= self.range then
       return true
     end
   end
+
   return false
+
 end
 
 return Light
