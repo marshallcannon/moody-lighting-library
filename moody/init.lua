@@ -126,9 +126,9 @@ function LightWorld:draw()
 
 end
 
-function LightWorld:newLight(mode, x, y, stature, range, color)
+function LightWorld:newLight(mode, x, y, stature, range, color, castShadows)
 
-  local newLight = Light.new(self, mode, x, y, stature, range, color)
+  local newLight = Light.new(self, mode, x, y, stature, range, color, castShadows)
   if mode == 'dynamic' then
     table.insert(self.lights, newLight)
   else
@@ -139,9 +139,9 @@ function LightWorld:newLight(mode, x, y, stature, range, color)
 
 end
 
-function LightWorld:newBeamLight(mode, x, y, stature, range, width, angle, color)
+function LightWorld:newBeamLight(mode, x, y, stature, range, width, angle, color, castShadows)
 
-  local newLight = BeamLight.new(self, mode, x, y, stature, range, width, angle, color)
+  local newLight = BeamLight.new(self, mode, x, y, stature, range, width, angle, color, castShadows)
   if mode == 'dynamic' then
     table.insert(self.lights, newLight)
   else

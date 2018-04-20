@@ -18,6 +18,7 @@ function BoxLight.new(world, mode, x, y, stature, width, height, color)
     self.width = width or 32
     self.height = height or 32
     self.color = color or {255, 255, 255, 255}
+    self.castShadows = castShadows or true
     self.on = true
 
     self:drawCanvas()
@@ -67,8 +68,15 @@ function BoxLight:setIntensity(intensity)
 end
 
 function BoxLight:hullInRange(hull)
-    for i, point in ipairs(hull.points) do
-        if math.abs(self.x - point.x) <= self.width/2 and math.abs(self.y - point.y) <= self.height/2 then
+    if hull.points then
+        for i, point in ipairs(hull.points) do
+            if math.abs(self.x - point.x) <= self.width/2 and math.abs(self.y - point.y) <= self.height/2 then
+                return true
+            end
+        end
+    else
+        if hull.x > self.x and hull.x <= self.x+self.width and
+        hull.y > self.y and hull.y <= self.y+self.height then
             return true
         end
     end

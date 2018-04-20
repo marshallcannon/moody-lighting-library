@@ -5,7 +5,7 @@ local Util = require(directory .. '/util')
 local Light = {}
 Light.__index = Light
 
-function Light.new(world, mode, x, y, stature, range, color)
+function Light.new(world, mode, x, y, stature, range, color, castShadows)
 
   local self = setmetatable({}, Light)
 
@@ -17,6 +17,7 @@ function Light.new(world, mode, x, y, stature, range, color)
   self.stature = stature
   self.range = range or 64
   self.color = color or {255, 255, 255, 255}
+  self.castShadows = castShadows or true
   self.on = true
 
   self:drawCanvas()

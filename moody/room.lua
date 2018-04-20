@@ -27,8 +27,6 @@ end
 
 function Room:draw()
 
-  local hulls, imageHulls, shadowTriangles, lightTriangles
-
   --Clear canvas
   love.graphics.setCanvas(self.lightCanvas)
   love.graphics.clear(self.world.ambient)
@@ -42,46 +40,13 @@ function Room:draw()
 
       if light.on and self:lightInRange(light) then
 
-        --Basic Hulls
-        hulls = Util.getHullsInRange(light, self.world.hulls)
-        shadowTriangles, lightTriangles = Util.getShadowTriangles(light, hulls)
-        love.graphics.setCanvas(self.lightCanvas)
-        love.graphics.stencil(function()
-          Util.drawHullShadows(shadowTriangles)
-        end, 'replace', 1)
-        love.graphics.stencil(function()
-          Util.drawHullShadows(lightTriangles)
-        end, 'replace', 0, true)
+        if light.castShadows then
 
-        --Image Hulls
-        imageHulls = Util.getHullsInRange(light, self.world.imageHulls)
-        love.graphics.stencil(function()
-          love.graphics.setShader(Shaders.mask)
-          for i, imageHull in ipairs(imageHulls) do
-            local shadowLength = Util.getShadowLength(light, imageHull)/4
-            local extendedPoint = Util.getExtendedPoint(light.x, light.y, imageHull.x, imageHull.y, shadowLength)
-            local xLength, yLength = extendedPoint.x-imageHull.x, extendedPoint.y-imageHull.y
-            local lightAngle = math.deg(Util.angle(light.x, light.y, imageHull.x, imageHull.y))
-            -- love.graphics.polygon('fill', imageHull.x, imageHull.y, imageHull.x, imageHull.y-imageHull.height,
-            -- extendedPoint.x, extendedPoint.y)
-            -- love.graphics.draw(imageHull.canvas, imageHull.x, imageHull.y-imageHull.height/2, Util.angle(light.x, light.y, imageHull.x, imageHull.y)+math.rad(90),
-            -- 1, shadowLength/imageHull.image:getHeight(), imageHull.width/4, imageHull.height)
-            love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
-            0, 1, (yLength/imageHull.image:getHeight())*-1, imageHull.image:getWidth()/2, imageHull.image:getHeight(), (xLength/imageHull.width)*-1, 0)
-          end
-          love.graphics.setShader()
-        end, 'replace', 1, true)
-        love.graphics.stencil(function()
-          love.graphics.setShader(Shaders.mask)
-          for i, imageHull in ipairs(imageHulls) do
-            love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
-            0, 1, 1, imageHull.image:getWidth()/2, imageHull.image:getHeight())
-          end
-          love.graphics.setShader()
-        end, 'replace', 0, true)
-
+          self:drawShadowsToStencil(light, true)
+          
+        end
+        
         --Draw light
-        love.graphics.setStencilTest('less', 1)
         light:draw(self.lightCanvas)
         love.graphics.setStencilTest()
         
@@ -108,7 +73,9 @@ function Room:draw()
       love.graphics.clear()
       for i, light in ipairs(self.world.staticLights) do
         if light.on and self:lightInRange(light) then
+          if light.castShadows then self:drawShadowsToStencil(light) end
           light:draw()
+          love.graphics.setStencilTest()
         end
       end
       self.staticStale = false
@@ -128,6 +95,53 @@ function Room:draw()
   love.graphics.setBlendMode('multiply', 'premultiplied')
   love.graphics.draw(self.lightCanvas, self.x, self.y)
   love.graphics.setBlendMode('alpha')
+
+end
+
+function Room:drawShadowsToStencil(light, drawImageHulls)
+
+  local hulls, imageHulls, shadowTriangles, lightTriangles
+
+  --Basic Hulls
+  hulls = Util.getHullsInRange(light, self.world.hulls)
+  shadowTriangles, lightTriangles = Util.getShadowTriangles(light, hulls)
+  love.graphics.stencil(function()
+    Util.drawHullShadows(shadowTriangles)
+  end, 'replace', 1)
+  love.graphics.stencil(function()
+    Util.drawHullShadows(lightTriangles)
+  end, 'replace', 0, true)
+
+  if drawImageHulls then
+    --Image Hulls
+    imageHulls = Util.getHullsInRange(light, self.world.imageHulls)
+    love.graphics.stencil(function()
+      love.graphics.setShader(Shaders.mask)
+      for i, imageHull in ipairs(imageHulls) do
+        local shadowLength = Util.getShadowLength(light, imageHull)/4
+        local extendedPoint = Util.getExtendedPoint(light.x, light.y, imageHull.x, imageHull.y, shadowLength)
+        local xLength, yLength = extendedPoint.x-imageHull.x, extendedPoint.y-imageHull.y
+        local lightAngle = math.deg(Util.angle(light.x, light.y, imageHull.x, imageHull.y))
+        -- love.graphics.polygon('fill', imageHull.x, imageHull.y, imageHull.x, imageHull.y-imageHull.height,
+        -- extendedPoint.x, extendedPoint.y)
+        -- love.graphics.draw(imageHull.canvas, imageHull.x, imageHull.y-imageHull.height/2, Util.angle(light.x, light.y, imageHull.x, imageHull.y)+math.rad(90),
+        -- 1, shadowLength/imageHull.image:getHeight(), imageHull.width/4, imageHull.height)
+        love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
+        0, 1, (yLength/imageHull.image:getHeight())*-1, imageHull.image:getWidth()/2, imageHull.image:getHeight(), (xLength/imageHull.width)*-1, 0)
+      end
+      love.graphics.setShader()
+    end, 'replace', 1, true)
+    love.graphics.stencil(function()
+      love.graphics.setShader(Shaders.mask)
+      for i, imageHull in ipairs(imageHulls) do
+        love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
+        0, 1, 1, imageHull.image:getWidth()/2, imageHull.image:getHeight())
+      end
+      love.graphics.setShader()
+    end, 'replace', 0, true)
+  end
+
+  love.graphics.setStencilTest('less', 1)
 
 end
 

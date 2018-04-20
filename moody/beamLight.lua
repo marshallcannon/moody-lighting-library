@@ -6,7 +6,7 @@ local Util = require(directory .. '/util')
 local BeamLight = {}
 BeamLight.__index = BeamLight
 
-function BeamLight.new(world, mode, x, y, stature, range, width, angle, color)
+function BeamLight.new(world, mode, x, y, stature, range, width, angle, color, castShadows)
 
     local self = setmetatable({}, BeamLight)
 
@@ -20,6 +20,7 @@ function BeamLight.new(world, mode, x, y, stature, range, width, angle, color)
     self.width = width or 1.0472
     self.angle = angle or 0
     self.color = color or {255, 255, 255, 255}
+    self.castShadows = castShadows or true
     self.on = true
 
     self:drawCanvas()

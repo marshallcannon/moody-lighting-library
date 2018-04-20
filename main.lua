@@ -32,8 +32,8 @@ math.randomseed(os.time())
 local light = lightWorld:newBeamLight('dynamic', 60, 50, 36, 200, math.rad(45), math.rad(180), {255, 255, 255}, true)
 
 local wall1 = lightWorld:newHull(100, 290, 250, 20, 80)
---local wall2 = lightWorld:newHull(450, 290, 250, 20, 80)
---local smallBox = lightWorld:newHull(300, 100, 20, 20, 20)
+local wall2 = lightWorld:newHull(450, 290, 250, 20, 80)
+local smallBox = lightWorld:newHull(300, 100, 20, 20, 20)
 
 
 local room1 = lightWorld:newRoom(100, 0, 600, 300)
