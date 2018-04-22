@@ -69,6 +69,7 @@ function Room:draw()
 
     --Static lights
     if self.staticStale == true then
+      print('update')
       love.graphics.setCanvas(self.staticLightCanvas)
       love.graphics.clear()
       for i, light in ipairs(self.world.staticLights) do
@@ -142,6 +143,35 @@ function Room:drawShadowsToStencil(light, drawImageHulls)
   end
 
   love.graphics.setStencilTest('less', 1)
+
+end
+
+function Room:objectInRange(object)
+
+  print(object.type)
+  if object.type == 'Hull' then
+    return self:hullInRange(object)
+  else
+    return self:lightInRange(object)
+  end
+
+end
+
+function Room:hullInRange(hull)
+
+  if hull.points then
+    for i, point in ipairs(hull.points) do
+        if math.abs(self.x - point.x) <= self.width/2 and math.abs(self.y - point.y) <= self.height/2 then
+            return true
+        end
+    end
+  else
+      if hull.x > self.x and hull.x <= self.x+self.width and
+      hull.y > self.y and hull.y <= self.y+self.height then
+          return true
+      end
+  end
+  return false
 
 end
 

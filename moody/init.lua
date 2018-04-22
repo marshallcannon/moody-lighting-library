@@ -133,7 +133,7 @@ function LightWorld:newLight(mode, x, y, stature, range, color, castShadows)
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self:staticStale()
+    self:staticStale(newLight)
   end
   return newLight
 
@@ -146,7 +146,7 @@ function LightWorld:newBeamLight(mode, x, y, stature, range, width, angle, color
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self:staticStale()
+    self:staticStale(newLight)
   end
   return newLight
 
@@ -159,7 +159,7 @@ function LightWorld:newBoxLight(mode, x, y, stature, width, height, color)
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self:staticStale()
+    self:staticStale(newLight)
   end
   return newLight
 
@@ -189,10 +189,22 @@ function LightWorld:newRoom(x, y, width, height)
 
 end
 
-function LightWorld:staticStale()
+function LightWorld:staticStale(object)
 
-  for i, room in ipairs(self.rooms) do
-    room.staticStale = true
+  if object then
+
+    for i, room in ipairs(self.rooms) do
+      if room:objectInRange(object) then
+        room.staticStale = true
+      end
+    end
+
+  else
+
+    for i, room in ipairs(self.rooms) do
+      room.staticStale = true
+    end
+
   end
 
 end

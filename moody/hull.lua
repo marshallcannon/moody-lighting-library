@@ -5,6 +5,7 @@ function Hull.new(world, x, y, width, height, stature)
 
   local self = setmetatable({}, Hull)
 
+  self.type = 'Hull'
   self.world = world
   self.x = x or 0
   self.y = y or 0
@@ -38,7 +39,10 @@ end
 
 function Hull:setTransparent(value)
 
-  self.transparent = value
+  if self.transparent ~= value then
+    self.transparent = value
+    self.world:staticStale(self)
+  end
 
 end
 
