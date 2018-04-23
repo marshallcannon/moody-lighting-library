@@ -18,7 +18,7 @@ function BoxLight.new(world, mode, x, y, stature, width, height, color)
     self.width = width or 32
     self.height = height or 32
     self.color = color or {255, 255, 255, 255}
-    self.castShadows = castShadows or true
+    self.castShadows = false
     self.on = true
 
     self:drawCanvas()
