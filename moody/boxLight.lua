@@ -5,7 +5,7 @@ local Light = require(directory .. '/light')
 local BoxLight = {}
 BoxLight.__index = BoxLight
 
-function BoxLight.new(world, mode, x, y, stature, width, height, color)
+function BoxLight.new(world, mode, x, y, stature, width, height, color, castShadows)
 
     local self = setmetatable({}, BoxLight)
 
@@ -18,8 +18,11 @@ function BoxLight.new(world, mode, x, y, stature, width, height, color)
     self.width = width or 32
     self.height = height or 32
     self.color = color or {255, 255, 255, 255}
-    self.castShadows = false
+    self.castShadows = castShadows or true
     self.on = true
+
+    if self.width > self.height then self.range = self.width
+    else self.range = self.height end
 
     self:drawCanvas()
 
@@ -69,10 +72,10 @@ end
 
 function BoxLight:hullInRange(hull)
     if hull.points then
-        for i, point in ipairs(hull.points) do
-            if math.abs(self.x - point.x) <= self.width/2 and math.abs(self.y - point.y) <= self.height/2 then
-                return true
-            end
+        local selfX, selfY = self.x-self.width/2, self.y-self.height/2
+        if hull.p1.x < selfX + self.width and hull.p2.x > selfX and
+        hull.p1.y < selfY + self.height and hull.p4.y > selfY then
+            return true
         end
     else
         if hull.x > self.x and hull.x <= self.x+self.width and

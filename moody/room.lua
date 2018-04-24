@@ -179,10 +179,13 @@ function Room:lightInRange(light)
 
   if light.type == 'BoxLight' then
 
-    if light.x < self.x + self.width and
-    light.x + light.width > self.x and
-    light.y < self.y + self.height and
-    light.y + light.width > self.y then
+    --Box Lights origin points are at the center so we need to get the top left corner
+    local boxLightX, boxLightY = light.x-light.width/2, light.y-light.height/2
+
+    if boxLightX < self.x + self.width and
+    boxLightX + light.width > self.x and
+    boxLightY < self.y + self.height and
+    boxLightY + light.width > self.y then
       return true
     end
 
