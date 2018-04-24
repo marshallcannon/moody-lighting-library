@@ -152,9 +152,9 @@ function LightWorld:newBeamLight(mode, x, y, stature, range, width, angle, color
 
 end
 
-function LightWorld:newBoxLight(mode, x, y, stature, width, height, color, castShadows)
+function LightWorld:newBoxLight(mode, x, y, width, height, stature, color, castShadows)
 
-  local newLight = BoxLight.new(self, mode, x, y, stature, width, height, color, castShadows)
+  local newLight = BoxLight.new(self, mode, x, y, width, height, stature, color, castShadows)
   if mode == 'dynamic' then
     table.insert(self.lights, newLight)
   else

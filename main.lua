@@ -165,7 +165,7 @@ function love.mousepressed(x, y, button, isTouch)
     lightWorld:newLight('static', x-translateX, y-translateY, 50, 200, {255, 255, 255})
   end
   if button == 2 then
-    boxLight = lightWorld:newBoxLight('static', x-translateX, y-translateY, 0, 100, 50, {255, 255, 255})
+    boxLight = lightWorld:newBoxLight('static', x-translateX, y-translateY, 100, 50, 0, {255, 255, 255})
   end
   if button == 3 then
     boxLight:setIntensity(100)

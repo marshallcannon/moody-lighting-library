@@ -5,7 +5,7 @@ local Light = require(directory .. '/light')
 local BoxLight = {}
 BoxLight.__index = BoxLight
 
-function BoxLight.new(world, mode, x, y, stature, width, height, color, castShadows)
+function BoxLight.new(world, mode, x, y, width, height, stature, color, castShadows)
 
     local self = setmetatable({}, BoxLight)
 
