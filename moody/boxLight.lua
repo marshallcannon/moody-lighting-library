@@ -61,13 +61,13 @@ end
 function BoxLight:setColor(color)
     self.color = color or {255, 255, 255, 255}
     self:drawCanvas()
-    if self.mode == 'static' then self.world:staticStale(self) end
+    if self.mode == 'static' then self.world:setStaticStale(self) end
 end
 
 function BoxLight:setIntensity(intensity)
     self.color[4] = intensity
     self:drawCanvas()
-    if self.mode == 'static' then self.world:staticStale(self) end
+    if self.mode == 'static' then self.world:setStaticStale(self) end
 end
 
 function BoxLight:hullInRange(hull)

@@ -38,8 +38,6 @@ end
 
 function LightWorld:draw()
 
-  local hulls, imageHulls, shadowTriangles, lightTriangles
-
   --Clear canvas
   love.graphics.setCanvas(self.lightCanvas)
   love.graphics.clear(self.ambient)
@@ -47,28 +45,20 @@ function LightWorld:draw()
   --Draw each light
   love.graphics.push()
     love.graphics.origin()
+    --love.graphics.translate(-self.x, -self.y)
     --Dynamic Lights
     for i, light in ipairs(self.lights) do
 
       if light.on then
 
-        --Basic Hulls
-        hulls = Util.getHullsInRange(light, self.hulls)
-        shadowTriangles, lightTriangles = Util.getShadowTriangles(light, hulls)
-        love.graphics.setCanvas(self.lightCanvas)
-        love.graphics.stencil(function()
-          Util.drawHullShadows(shadowTriangles)
-        end, 'replace', 1)
-        love.graphics.stencil(function()
-          Util.drawHullShadows(lightTriangles)
-        end, 'replace', 0, true)
+        if light.castShadows then
 
-        --Image Hulls
-        imageHulls = Util.getHullsInRange(light, self.imageHulls)
-
-        --Draw Light
-        love.graphics.setStencilTest('less', 1)
-        light:draw(self.lightCanvas, self.offsetX, self.offsetY)
+          self:drawShadowsToStencil(light, true)
+          
+        end
+        
+        --Draw light
+        light:draw(self.lightCanvas)
         love.graphics.setStencilTest()
         
         --SHADOW DEBUG
@@ -93,14 +83,17 @@ function LightWorld:draw()
       love.graphics.setCanvas(self.staticLightCanvas)
       love.graphics.clear()
       for i, light in ipairs(self.staticLights) do
-        if light.on then
+        if light.on and self:lightInRange(light) then
+          if light.castShadows then self:drawShadowsToStencil(light) end
           light:draw()
+          love.graphics.setStencilTest()
         end
       end
       self.staticStale = false
     end
 
     --Draw static light canvas to light canvas
+    -- love.graphics.translate(self.x, self.y)
     love.graphics.setCanvas(self.lightCanvas)
     love.graphics.setBlendMode('add', 'premultiplied')
     love.graphics.draw(self.staticLightCanvas)
@@ -111,18 +104,55 @@ function LightWorld:draw()
   love.graphics.setCanvas()
   love.graphics.setColor(255, 255, 255, 255)
   love.graphics.setBlendMode('multiply', 'premultiplied')
-  love.graphics.draw(self.lightCanvas)
+  love.graphics.draw(self.lightCanvas, self.x, self.y)
   love.graphics.setBlendMode('alpha')
 
-  if self.debug then
-    --Debug draw hulls
-    for i, hull in ipairs(self.hulls) do
-      love.graphics.setColor(100, 100, 100, 255)
-      love.graphics.rectangle('line', hull.x, hull.y, hull.width, hull.height)
-      -- love.graphics.setColor(255, 0, 0, 255)
-      -- love.graphics.points(hull.p1.x, hull.p1.y, hull.p2.x, hull.p2.y, hull.p3.x, hull.p3.y, hull.p4.x, hull.p4.y)
-    end
+end
+
+function LightWorld:drawShadowsToStencil(light, drawImageHulls)
+
+  local hulls, imageHulls, shadowTriangles, lightTriangles
+
+  --Basic Hulls
+  hulls = Util.getHullsInRange(light, self.hulls)
+  shadowTriangles, lightTriangles = Util.getShadowTriangles(light, hulls)
+  love.graphics.stencil(function()
+    Util.drawHullShadows(shadowTriangles)
+  end, 'replace', 1)
+  love.graphics.stencil(function()
+    Util.drawHullShadows(lightTriangles)
+  end, 'replace', 0, true)
+
+  if drawImageHulls then
+    --Image Hulls
+    imageHulls = Util.getHullsInRange(light, self.imageHulls)
+    love.graphics.stencil(function()
+      love.graphics.setShader(Shaders.mask)
+      for i, imageHull in ipairs(imageHulls) do
+        local shadowLength = Util.getShadowLength(light, imageHull)/4
+        local extendedPoint = Util.getExtendedPoint(light.x, light.y, imageHull.x, imageHull.y, shadowLength)
+        local xLength, yLength = extendedPoint.x-imageHull.x, extendedPoint.y-imageHull.y
+        local lightAngle = math.deg(Util.angle(light.x, light.y, imageHull.x, imageHull.y))
+        -- love.graphics.polygon('fill', imageHull.x, imageHull.y, imageHull.x, imageHull.y-imageHull.height,
+        -- extendedPoint.x, extendedPoint.y)
+        -- love.graphics.draw(imageHull.canvas, imageHull.x, imageHull.y-imageHull.height/2, Util.angle(light.x, light.y, imageHull.x, imageHull.y)+math.rad(90),
+        -- 1, shadowLength/imageHull.image:getHeight(), imageHull.width/4, imageHull.height)
+        love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
+        0, 1, (yLength/imageHull.image:getHeight())*-1, imageHull.image:getWidth()/2, imageHull.image:getHeight(), (xLength/imageHull.width)*-1, 0)
+      end
+      love.graphics.setShader()
+    end, 'replace', 1, true)
+    love.graphics.stencil(function()
+      love.graphics.setShader(Shaders.mask)
+      for i, imageHull in ipairs(imageHulls) do
+        love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
+        0, 1, 1, imageHull.image:getWidth()/2, imageHull.image:getHeight())
+      end
+      love.graphics.setShader()
+    end, 'replace', 0, true)
   end
+
+  love.graphics.setStencilTest('less', 1)
 
 end
 
@@ -133,7 +163,7 @@ function LightWorld:newLight(mode, x, y, stature, range, color, castShadows)
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self:staticStale(newLight)
+    self:setStaticStale(newLight)
   end
   return newLight
 
@@ -146,7 +176,7 @@ function LightWorld:newBeamLight(mode, x, y, stature, range, width, angle, color
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self:staticStale(newLight)
+    self:setStaticStale(newLight)
   end
   return newLight
 
@@ -159,7 +189,7 @@ function LightWorld:newBoxLight(mode, x, y, width, height, stature, color, castS
     table.insert(self.lights, newLight)
   else
     table.insert(self.staticLights, newLight)
-    self:staticStale(newLight)
+    self:setStaticStale(newLight)
   end
   return newLight
 
@@ -189,23 +219,25 @@ function LightWorld:newRoom(x, y, width, height)
 
 end
 
-function LightWorld:staticStale(object)
+function LightWorld:setStaticStale(object)
 
-  if object then
+  self.staticStale = true
 
-    for i, room in ipairs(self.rooms) do
-      if room:objectInRange(object) then
-        room.staticStale = true
-      end
-    end
+  -- if object then
 
-  else
+  --   for i, room in ipairs(self.rooms) do
+  --     if room:objectInRange(object) then
+  --       room.staticStale = true
+  --     end
+  --   end
 
-    for i, room in ipairs(self.rooms) do
-      room.staticStale = true
-    end
+  -- else
 
-  end
+  --   for i, room in ipairs(self.rooms) do
+  --     room.staticStale = true
+  --   end
+
+  -- end
 
 end
 

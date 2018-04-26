@@ -41,7 +41,7 @@ function Hull:setTransparent(value)
 
   if self.transparent ~= value then
     self.transparent = value
-    self.world:staticStale(self)
+    self.world:setStaticStale(self)
   end
 
 end

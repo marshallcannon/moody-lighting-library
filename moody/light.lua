@@ -76,7 +76,7 @@ function Light:toggle(value)
   end
 
   if self.mode == 'static' then
-    self.world:staticStale(self)
+    self.world:setStaticStale(self)
   end
 
 end

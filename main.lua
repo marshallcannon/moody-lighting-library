@@ -90,9 +90,9 @@ function love.draw()
   love.graphics.circle('fill', lightX, lightY, 5)
   
   --Lights
-  --lightWorld:draw()
-  room1:draw()
-  room2:draw()
+  lightWorld:draw()
+  --room1:draw()
+  --room2:draw()
 
   --Info
   love.graphics.setColor(255, 255, 255, 255)
@@ -152,9 +152,11 @@ function love.update()
   if lightY < 310 then
     wallOpacity = 100
     wall1:setTransparent(true)
+    wall2:setTransparent(true)
   else
     wallOpacity = 255
     wall1:setTransparent(false)
+    wall2:setTransparent(false)
   end
 
 end
@@ -165,7 +167,7 @@ function love.mousepressed(x, y, button, isTouch)
     lightWorld:newLight('static', x-translateX, y-translateY, 50, 200, {255, 255, 255})
   end
   if button == 2 then
-    boxLight = lightWorld:newBoxLight('static', x-translateX, y-translateY, 100, 50, 0, {255, 255, 255})
+    boxLight = lightWorld:newBoxLight('static', x-translateX, y-translateY, 300, 250, 50, {255, 255, 255})
   end
   if button == 3 then
     boxLight:setIntensity(100)
