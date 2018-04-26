@@ -83,7 +83,7 @@ function LightWorld:draw()
       love.graphics.setCanvas(self.staticLightCanvas)
       love.graphics.clear()
       for i, light in ipairs(self.staticLights) do
-        if light.on and self:lightInRange(light) then
+        if light.on then
           if light.castShadows then self:drawShadowsToStencil(light) end
           light:draw()
           love.graphics.setStencilTest()
