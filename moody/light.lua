@@ -111,4 +111,15 @@ function Light:hullInRange(hull)
 
 end
 
+function Light:destroy()
+
+  if self.mode == 'static' then
+    Util.removeElementFromTable(self.world.staticLights, self)
+    self.world:setStaticStale(self)
+  else
+    Util.removeElementFromTable(self.world.lights, self)
+  end
+
+end
+
 return Light

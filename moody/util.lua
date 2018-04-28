@@ -351,4 +351,14 @@ Util.getShadowLength = function(light, hull)
 
 end
 
+Util.removeElementFromTable = function(_table, element)
+
+  for i, object in ipairs(_table) do
+    if object == element then
+      table.remove(_table, i)
+    end
+  end
+
+end
+
 return Util

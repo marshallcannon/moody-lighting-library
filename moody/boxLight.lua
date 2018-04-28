@@ -1,6 +1,7 @@
 local directory = (...):match("^(.+)[%./][^%./]+") or ""
 local Shaders = require(directory .. '/shaders')
 local Light = require(directory .. '/light')
+local Util = require(directory .. '/util')
 
 local BoxLight = {}
 BoxLight.__index = BoxLight
@@ -85,5 +86,16 @@ function BoxLight:hullInRange(hull)
     end
     return false
 end
+
+function BoxLight:destroy()
+
+    if self.mode == 'static' then
+      Util.removeElementFromTable(self.world.staticLights, self)
+      self.world:setStaticStale(self)
+    else
+      Util.removeElementFromTable(self.world.lights, self)
+    end
+  
+  end
 
 return BoxLight

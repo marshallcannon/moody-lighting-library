@@ -1,3 +1,6 @@
+local directory = (...):match("^(.+)[%./][^%./]+") or ""
+local Util = require(directory .. '/util')
+
 local Hull = {}
 Hull.__index = Hull
 
@@ -73,6 +76,13 @@ end
 function Hull:getCenter()
 
   return self.x+self.width/2, self.y+self.height/2
+
+end
+
+function Hull:destroy()
+
+  Util.removeElementFromTable(self.world.hulls, self)
+  self.world:setStaticStale(self)
 
 end
 

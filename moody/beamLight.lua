@@ -75,4 +75,15 @@ function BeamLight:rotate(angle)
   return self.angle
 end
 
+function BeamLight:destroy()
+
+  if self.mode == 'static' then
+    Util.removeElementFromTable(self.world.staticLights, self)
+    self.world:setStaticStale(self)
+  else
+    Util.removeElementFromTable(self.world.lights, self)
+  end
+
+end
+
 return BeamLight

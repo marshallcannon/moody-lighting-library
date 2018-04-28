@@ -1,3 +1,6 @@
+local directory = (...):match("^(.+)[%./][^%./]+") or ""
+local Util = require(directory .. '/util')
+
 local ImageHull = {}
 ImageHull.__index = ImageHull
 
@@ -34,6 +37,13 @@ end
 function ImageHull:getCenter()
 
   return self.x, self.y
+
+end
+
+function ImageHull:destroy()
+
+  Util.removeElementFromTable(self.world.imageHulls, self)
+  self.world:setStaticStale(self)
 
 end
 

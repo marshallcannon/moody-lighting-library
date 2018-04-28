@@ -179,4 +179,8 @@ function love.keypressed(key)
 
   Pie:keypressed(key)
 
+  if key == 'delete' then
+    imageHull:destroy()
+  end
+
 end

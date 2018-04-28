@@ -129,7 +129,7 @@ function LightWorld:drawShadowsToStencil(light, drawImageHulls)
     love.graphics.stencil(function()
       love.graphics.setShader(Shaders.mask)
       for i, imageHull in ipairs(imageHulls) do
-        local shadowLength = Util.getShadowLength(light, imageHull)/4
+        local shadowLength = Util.getShadowLength(light, imageHull)
         local extendedPoint = Util.getExtendedPoint(light.x, light.y, imageHull.x, imageHull.y, shadowLength)
         local xLength, yLength = extendedPoint.x-imageHull.x, extendedPoint.y-imageHull.y
         local lightAngle = math.deg(Util.angle(light.x, light.y, imageHull.x, imageHull.y))
