@@ -132,21 +132,30 @@ function LightWorld:drawShadowsToStencil(light, drawImageHulls)
         local shadowLength = Util.getShadowLength(light, imageHull)
         local extendedPoint = Util.getExtendedPoint(light.x, light.y, imageHull.x, imageHull.y, shadowLength)
         local xLength, yLength = extendedPoint.x-imageHull.x, extendedPoint.y-imageHull.y
-        local lightAngle = math.deg(Util.angle(light.x, light.y, imageHull.x, imageHull.y))
         -- love.graphics.polygon('fill', imageHull.x, imageHull.y, imageHull.x, imageHull.y-imageHull.height,
         -- extendedPoint.x, extendedPoint.y)
         -- love.graphics.draw(imageHull.canvas, imageHull.x, imageHull.y-imageHull.height/2, Util.angle(light.x, light.y, imageHull.x, imageHull.y)+math.rad(90),
         -- 1, shadowLength/imageHull.image:getHeight(), imageHull.width/4, imageHull.height)
-        love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
-        0, 1, (yLength/imageHull.image:getHeight())*-1, imageHull.image:getWidth()/2, imageHull.image:getHeight(), (xLength/imageHull.width)*-1, 0)
+        if imageHull.quad then
+          love.graphics.draw(imageHull.image, imageHull.quad, imageHull.x, imageHull.y,
+          0, 1, (yLength/imageHull.height)*-1, imageHull.width/2, imageHull.height, (xLength/imageHull.width)*-1, 0)
+        else
+          love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
+          0, 1, (yLength/imageHull.image:getHeight())*-1, imageHull.image:getWidth()/2, imageHull.image:getHeight(), (xLength/imageHull.width)*-1, 0)
+        end
       end
       love.graphics.setShader()
     end, 'replace', 1, true)
     love.graphics.stencil(function()
       love.graphics.setShader(Shaders.mask)
       for i, imageHull in ipairs(imageHulls) do
-        love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
-        0, 1, 1, imageHull.image:getWidth()/2, imageHull.image:getHeight())
+        if imageHull.quad then
+          love.graphics.draw(imageHull.image, imageHull.quad, imageHull.x, imageHull.y,
+          0, 1, 1, imageHull.width/2, imageHull.height)
+        else
+          love.graphics.draw(imageHull.image, imageHull.x, imageHull.y,
+          0, 1, 1, imageHull.image:getWidth()/2, imageHull.image:getHeight())
+        end
       end
       love.graphics.setShader()
     end, 'replace', 0, true)

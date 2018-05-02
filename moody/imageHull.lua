@@ -11,16 +11,16 @@ function ImageHull.new(world, x, y, image, width, height, stature)
   self.world = world
   self.x = x or 0
   self.y = y or 0
-  self.image = image
-  self.width = width or image:getWidth()
-  self.height = height or image:getHeight()
-  self.stature = stature or image:getHeight()
-
-  self.canvas = love.graphics.newCanvas(self.width/2, self.height)
-  love.graphics.setCanvas(self.canvas)
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.rectangle('fill', 0, 0, self.width/2, self.height, 30, 30)
-  love.graphics.setCanvas()
+  if type(image) == 'table' then
+    self.image = image[1]
+    self.quad = image[2]
+  else
+    self.image = image
+  end
+  --If you're using a quad you need to specify these dimensions
+  self.width = width or self.image:getWidth()
+  self.height = height or self.image:getHeight()
+  self.stature = stature or self.image:getHeight()
 
   self.active = true
 
@@ -30,7 +30,12 @@ end
 
 function ImageHull:setImage(image)
 
-  self.image = image
+  if type(image) == 'table' then
+    self.image = image[1]
+    self.quad = image[2]
+  else
+    self.image = image
+  end
 
 end
 
